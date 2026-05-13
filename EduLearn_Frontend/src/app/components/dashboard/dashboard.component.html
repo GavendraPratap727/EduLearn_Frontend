@@ -1,0 +1,113 @@
+<div class="dashboard-container">
+  <div class="dashboard-header" data-aos="fade-up">
+    <h1 class="gradient-text">Welcome back, {{ currentUser?.fullName || 'Learner' }}!</h1>
+    <p>Continue your learning journey</p>
+  </div>
+
+  <div *ngIf="loading" class="loading-container">
+    <div class="spinner"></div>
+    <p>Loading your dashboard...</p>
+  </div>
+
+  <div *ngIf="!loading" class="dashboard-content">
+    <!-- Stats Section -->
+    <div class="stats-grid" data-aos="fade-up" data-aos-delay="100">
+      <div class="stat-card">
+        <div class="stat-icon">
+          <i class="fas fa-book-open"></i>
+        </div>
+        <div class="stat-info">
+          <h3>{{ enrolledCourses.length }}</h3>
+          <p>Enrolled Courses</p>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon">
+          <i class="fas fa-trophy"></i>
+        </div>
+        <div class="stat-info">
+          <h3>0</h3>
+          <p>Completed</p>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon">
+          <i class="fas fa-certificate"></i>
+        </div>
+        <div class="stat-info">
+          <h3>0</h3>
+          <p>Certificates</p>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon">
+          <i class="fas fa-clock"></i>
+        </div>
+        <div class="stat-info">
+          <h3>0h</h3>
+          <p>Learning Time</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- My Courses Section -->
+    <div class="section" data-aos="fade-up" data-aos-delay="200">
+      <h2 class="section-title">My Courses</h2>
+      
+      <div *ngIf="enrolledCourses.length > 0" class="courses-grid">
+        <div
+          *ngFor="let enrollment of enrolledCourses"
+          class="course-card-mini"
+          (click)="viewCourse(enrollment.courseId)"
+        >
+          <div class="course-icon">
+            <i class="fas fa-graduation-cap"></i>
+          </div>
+          <div class="course-details">
+            <h4>{{ enrollment.courseTitle || 'Course Title' }}</h4>
+            <div class="progress-bar">
+              <div class="progress-fill" [style.width.%]="enrollment.progress || 0"></div>
+            </div>
+            <p class="progress-text">{{ enrollment.progress || 0 }}% Complete</p>
+          </div>
+        </div>
+      </div>
+
+      <div *ngIf="enrolledCourses.length === 0" class="empty-state">
+        <i class="fas fa-book"></i>
+        <h3>No courses enrolled yet</h3>
+        <p>Start exploring courses and begin your learning journey!</p>
+        <button class="btn btn-primary">Browse Courses</button>
+      </div>
+    </div>
+
+    <!-- Recommended Courses Section -->
+    <div class="section" data-aos="fade-up" data-aos-delay="300">
+      <h2 class="section-title">Recommended for You</h2>
+      
+      <div class="courses-grid">
+        <div
+          *ngFor="let course of topCourses"
+          class="course-card-mini"
+          (click)="viewCourse(course.courseId)"
+        >
+          <div class="course-icon">
+            <i class="fas fa-star"></i>
+          </div>
+          <div class="course-details">
+            <h4>{{ course.title }}</h4>
+            <p class="course-meta">
+              <i class="fas fa-users"></i> {{ course.enrollmentCount || 0 }} students
+            </p>
+            <p class="course-meta">
+              <i class="fas fa-star"></i> {{ course.rating || 4.5 }}
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,340 @@
+<div class="lesson-manager">
+  <div class="manager-header">
+    <h2>Course Content</h2>
+    <div class="header-actions">
+      <button class="add-lesson-btn" (click)="showAddLessonForm()">
+        <i class="fas fa-plus"></i>
+        Add Lesson
+      </button>
+      <button class="add-quiz-btn" (click)="showAddQuizForm()">
+        <i class="fas fa-question-circle"></i>
+        Add Quiz
+      </button>
+    </div>
+  </div>
+
+  <!-- Error Message -->
+  <div class="error-message" *ngIf="error">
+    <i class="fas fa-exclamation-circle"></i>
+    {{ error }}
+  </div>
+
+  <!-- Loading State -->
+  <div class="loading-container" *ngIf="loading">
+    <div class="loading-spinner">
+      <div class="spinner"></div>
+    </div>
+    <p class="loading-text">Loading lessons...</p>
+  </div>
+
+  <!-- Quiz Form -->
+  <div class="quiz-form" *ngIf="showQuizForm">
+    <div class="form-header">
+      <h3>{{ editingQuiz ? 'Edit Quiz' : 'Add New Quiz' }}</h3>
+      <button class="close-btn" (click)="hideQuizForm()">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+
+    <div class="form-body">
+      <div class="form-group">
+        <label for="quizTitle">Quiz Title *</label>
+        <input
+          type="text"
+          id="quizTitle"
+          [(ngModel)]="newQuiz.title"
+          name="quizTitle"
+          required
+          placeholder="Enter quiz title">
+      </div>
+
+      <div class="form-group">
+        <label for="quizDescription">Description</label>
+        <textarea
+          id="quizDescription"
+          [(ngModel)]="newQuiz.description"
+          name="quizDescription"
+          rows="3"
+          placeholder="Describe the quiz content"></textarea>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="timeLimit">Time Limit (minutes) *</label>
+          <input
+            type="number"
+            id="timeLimit"
+            [(ngModel)]="newQuiz.timeLimitMinutes"
+            name="timeLimit"
+            required
+            min="1"
+            placeholder="e.g., 30">
+        </div>
+
+        <div class="form-group">
+          <label for="passingScore">Passing Score (%) *</label>
+          <input
+            type="number"
+            id="passingScore"
+            [(ngModel)]="newQuiz.passingScore"
+            name="passingScore"
+            required
+            min="0"
+            max="100"
+            placeholder="e.g., 70">
+        </div>
+
+        <div class="form-group">
+          <label for="maxAttempts">Max Attempts *</label>
+          <input
+            type="number"
+            id="maxAttempts"
+            [(ngModel)]="newQuiz.maxAttempts"
+            name="maxAttempts"
+            required
+            min="1"
+            placeholder="e.g., 3">
+        </div>
+      </div>
+
+      <!-- Questions Section -->
+      <div class="questions-section">
+        <div class="section-header">
+          <h4>Questions</h4>
+          <button type="button" class="add-btn" (click)="addQuestion()">
+            <i class="fas fa-plus"></i>
+            Add Question
+          </button>
+        </div>
+
+        <div class="questions-list" *ngIf="newQuiz.questions.length > 0">
+          <div class="question-item" *ngFor="let question of newQuiz.questions; let i = index; trackBy: trackByQuestionId">
+            <div class="question-header">
+              <span class="question-number">Question {{ i + 1 }}</span>
+              <button
+                type="button"
+                class="remove-btn"
+                (click)="removeQuestion(i)"
+                *ngIf="newQuiz.questions.length > 1">
+                <i class="fas fa-trash"></i>
+              </button>
+            </div>
+
+            <div class="question-body">
+              <div class="form-group">
+                <label>Question Text *</label>
+                <textarea
+                  [(ngModel)]="question.questionText"
+                  [name]="'questionText' + i"
+                  rows="2"
+                  placeholder="Enter the question"
+                  (input)="updateQuestionText(i, question.questionText)"></textarea>
+              </div>
+
+              <div class="options-list">
+                <label>Options (Select the correct answer by clicking the radio button)</label>
+                <div class="option-item" *ngFor="let option of question.options; let optIndex = index; trackBy: trackByOptionIndex">
+                  <input
+                    type="radio"
+                    [name]="'correctAnswer' + i"
+                    [checked]="question.correctAnswer === optIndex"
+                    (change)="setCorrectAnswer(i, optIndex)"
+                    class="correct-answer-radio">
+                  <input
+                    type="text"
+                    [(ngModel)]="question.options[optIndex]"
+                    [name]="'option' + i + '_' + optIndex"
+                    placeholder="Option {{ optIndex + 1 }}"
+                    (input)="updateQuestionOption(i, optIndex, question.options[optIndex])">
+                  <span class="correct-badge" *ngIf="question.correctAnswer === optIndex">
+                    <i class="fas fa-check"></i> Correct
+                  </span>
+                  <span class="no-correct-answer" *ngIf="optIndex === 0 && question.correctAnswer === null">
+                    <i class="fas fa-exclamation-triangle"></i> Select correct answer
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="empty-state" *ngIf="newQuiz.questions.length === 0">
+          <p>No questions added yet. Click "Add Question" to get started.</p>
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button type="button" class="cancel-btn" (click)="hideQuizForm()">Cancel</button>
+        <button type="button" class="save-btn" (click)="saveQuiz()" [disabled]="saving">
+          <i class="fas fa-save"></i>
+          {{ saving ? 'Saving...' : (editingQuiz ? 'Update Quiz' : 'Create Quiz') }}
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Lesson Form -->
+  <div class="lesson-form" *ngIf="showAddForm">
+    <div class="form-header">
+      <h3>{{ editingLesson ? 'Edit Lesson' : 'Add New Lesson' }}</h3>
+      <button class="close-btn" (click)="hideForm()">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+
+    <div class="form-body">
+      <div class="form-group">
+        <label for="title">Lesson Title *</label>
+        <input
+          type="text"
+          id="title"
+          [(ngModel)]="newLesson.title"
+          name="title"
+          required
+          placeholder="Enter lesson title">
+      </div>
+
+      <div class="form-group">
+        <label for="description">Description</label>
+        <textarea
+          id="description"
+          [(ngModel)]="newLesson.description"
+          name="description"
+          rows="3"
+          placeholder="Describe the lesson content"></textarea>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="contentType">Content Type *</label>
+          <select id="contentType" [(ngModel)]="newLesson.contentType" name="contentType" required>
+            <option *ngFor="let type of contentTypes" [value]="type.value">{{ type.label }}</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="durationMinutes">Duration (minutes) *</label>
+          <input
+            type="number"
+            id="durationMinutes"
+            [(ngModel)]="newLesson.durationMinutes"
+            name="durationMinutes"
+            required
+            min="1"
+            placeholder="e.g., 30">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="contentUrl">Content URL</label>
+        <input
+          type="text"
+          id="contentUrl"
+          [(ngModel)]="newLesson.contentUrl"
+          name="contentUrl"
+          placeholder="Video URL, PDF link, or article URL">
+      </div>
+
+      <div class="form-group checkbox-group">
+        <label class="checkbox-label">
+          <input type="checkbox" [(ngModel)]="newLesson.isPreview" name="isPreview">
+          <span>Make this lesson free preview</span>
+        </label>
+      </div>
+
+      <div class="form-actions">
+        <button type="button" class="cancel-btn" (click)="hideForm()">Cancel</button>
+        <button type="button" class="save-btn" (click)="saveLesson()" [disabled]="saving">
+          <i class="fas fa-save"></i>
+          {{ saving ? 'Saving...' : (editingLesson ? 'Update Lesson' : 'Add Lesson') }}
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Quizzes List -->
+  <div class="quizzes-list" *ngIf="quizzes.length > 0">
+    <h3>Quizzes</h3>
+    <div class="quiz-item" *ngFor="let quiz of quizzes; trackBy: trackByQuizId">
+      <div class="quiz-content">
+        <div class="quiz-header">
+          <h4 class="quiz-title">{{ quiz.title }}</h4>
+          <div class="quiz-badges">
+            <span class="badge questions">{{ quiz.questions?.length || 0 }} Questions</span>
+            <span class="badge time">{{ quiz.timeLimitMinutes }} min</span>
+            <span class="badge passing">{{ quiz.passingScore }}% to pass</span>
+            <span class="badge published" *ngIf="quiz.isPublished">Published</span>
+            <span class="badge draft" *ngIf="!quiz.isPublished">Draft</span>
+          </div>
+        </div>
+        
+        <p class="quiz-description" *ngIf="quiz.description">{{ quiz.description }}</p>
+      </div>
+
+      <div class="quiz-actions">
+        <button class="action-btn edit" (click)="showEditQuizForm(quiz)" title="Edit Quiz">
+          <i class="fas fa-edit"></i>
+        </button>
+        <button class="action-btn publish" (click)="publishQuiz(quiz.quizId)" *ngIf="!quiz.isPublished" title="Publish Quiz">
+          <i class="fas fa-globe"></i>
+        </button>
+        <button class="action-btn delete" (click)="deleteQuiz(quiz.quizId)" title="Delete Quiz">
+          <i class="fas fa-trash"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Lessons List -->
+  <div class="lessons-list" *ngIf="!loading">
+    <h3>Lessons</h3>
+    <div class="empty-state" *ngIf="lessons.length === 0">
+      <div class="empty-icon">
+        <i class="fas fa-video"></i>
+      </div>
+      <h3>No lessons yet</h3>
+      <p>Start building your course by adding your first lesson</p>
+      <button class="primary-btn" (click)="showAddLessonForm()">
+        <i class="fas fa-plus"></i>
+        Add First Lesson
+      </button>
+    </div>
+
+    <div class="lesson-item" *ngFor="let lesson of lessons; let i = index; trackBy: trackByLessonId">
+      <div class="lesson-number">{{ i + 1 }}</div>
+      
+      <div class="lesson-content">
+        <div class="lesson-header">
+          <h4 class="lesson-title">{{ lesson.title }}</h4>
+          <div class="lesson-badges">
+            <span class="badge type">{{ getContentTypeLabel(lesson.contentType) }}</span>
+            <span class="badge preview" *ngIf="lesson.isPreview">Preview</span>
+            <span class="badge duration">{{ lesson.durationMinutes }} min</span>
+          </div>
+        </div>
+        
+        <p class="lesson-description" *ngIf="lesson.description">{{ lesson.description }}</p>
+        
+        <div class="lesson-meta" *ngIf="lesson.contentUrl">
+          <i class="fas fa-link"></i>
+          <span>{{ lesson.contentUrl }}</span>
+        </div>
+      </div>
+
+      <div class="lesson-actions">
+        <button class="action-btn" (click)="moveLessonUp(i)" [disabled]="i === 0" title="Move Up">
+          <i class="fas fa-chevron-up"></i>
+        </button>
+        <button class="action-btn" (click)="moveLessonDown(i)" [disabled]="i === lessons.length - 1" title="Move Down">
+          <i class="fas fa-chevron-down"></i>
+        </button>
+        <button class="action-btn edit" (click)="showEditLessonForm(lesson)" title="Edit">
+          <i class="fas fa-edit"></i>
+        </button>
+        <button class="action-btn delete" (click)="deleteLesson(lesson.lessonId)" title="Delete">
+          <i class="fas fa-trash"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,353 @@
+<div class="course-learning" *ngIf="!loading; else loadingTemplate">
+  <!-- Header -->
+  <div class="learning-header">
+    <button class="back-btn" (click)="goBack()">
+      <i class="fas fa-arrow-left"></i>
+      Back to Dashboard
+    </button>
+    <div class="course-info">
+      <h1 class="course-title">{{ course?.title }}</h1>
+      <p class="course-progress">Lesson {{ currentIndex + 1 }} of {{ lessons.length }}</p>
+    </div>
+  </div>
+
+  <!-- Error Message -->
+  <div class="error-message" *ngIf="error">
+    <i class="fas fa-exclamation-circle"></i>
+    {{ error }}
+  </div>
+
+  <!-- Main Content -->
+  <div class="learning-content" *ngIf="currentLesson">
+    <!-- Lesson Sidebar -->
+    <div class="lesson-sidebar">
+      <div class="sidebar-header">
+        <h3>Course Content</h3>
+        <span class="lesson-count">{{ lessons.length }} lessons</span>
+      </div>
+
+      <div class="lesson-list">
+        <div class="lesson-item" *ngFor="let lesson of lessons; let i = index"
+          [class.active]="(lesson.lessonId || lesson.LessonId) === (currentLesson.lessonId || currentLesson.LessonId)"
+          [class.completed]="isLessonCompleted(lesson)" (click)="selectLesson(lesson, i)">
+          <div class="lesson-number">
+            <i class="fas fa-check" *ngIf="isLessonCompleted(lesson); else num"></i>
+            <ng-template #num>{{ i + 1 }}</ng-template>
+          </div>
+          <div class="lesson-info">
+            <h4 class="lesson-title">{{ lesson.title }}</h4>
+            <div class="lesson-meta">
+              <span class="meta-item">
+                <i class="fas" [ngClass]="lesson.contentType === 'VIDEO' ? 'fa-play-circle' : 'fa-file-alt'"></i>
+                {{ getContentTypeLabel(lesson.contentType) }}
+              </span>
+              <span class="meta-item">
+                <i class="far fa-clock"></i>
+                {{ lesson.durationMinutes || 0 }} min
+              </span>
+            </div>
+          </div>
+          <div class="status-icon" *ngIf="isLessonCompleted(lesson)">
+            <i class="fas fa-check-circle"></i>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quizzes Section -->
+      <div class="quizzes-section" *ngIf="quizzes.length > 0">
+        <div class="section-header">
+          <h3>Quizzes</h3>
+          <span class="quiz-count">{{ quizzes.length }}</span>
+        </div>
+        <div class="quiz-list">
+          <div class="quiz-item" *ngFor="let quiz of quizzes" (click)="openQuiz(quiz)"
+            [class.locked]="isQuizLocked(quiz).locked">
+            <div class="quiz-item-header">
+              <div class="quiz-icon">
+                <i class="fas" [ngClass]="isQuizLocked(quiz).locked ? 'fa-lock' : 'fa-tasks'"></i>
+              </div>
+              <div class="quiz-info">
+                <h4 class="quiz-title">{{ quiz.title }}</h4>
+                <div class="quiz-meta">
+                  <span><i class="fas fa-question-circle"></i> {{ quiz.questions?.length || 0 }} Questions</span>
+                  <span><i class="far fa-clock"></i> {{ quiz.timeLimitMinutes || 30 }} Min</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="quiz-attempt-status" *ngIf="quizAttemptData[quiz.quizId]">
+              <div class="status-badge best-score">
+                <span class="badge-label">Best Score</span>
+                <span class="badge-value">{{ quizAttemptData[quiz.quizId].bestScore }}%</span>
+              </div>
+              <div class="status-badge attempts">
+                <span class="badge-label">Attempts</span>
+                <span class="badge-value">{{ quizAttemptData[quiz.quizId].attemptCount }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Lesson Player -->
+    <div class="lesson-player">
+      <div class="player-header">
+        <h2 class="current-lesson-title">{{ currentLesson.title }}</h2>
+        <div class="lesson-badges">
+          <span class="badge type">{{ getContentTypeLabel(currentLesson.contentType) }}</span>
+          <span class="badge duration">{{ currentLesson.durationMinutes }} min</span>
+        </div>
+      </div>
+
+      <div class="player-content">
+        <!-- Video Content -->
+        <div class="content-video" *ngIf="isContentType(currentLesson, 'VIDEO')">
+          <div class="video-player custom-plyr-theme">
+            <!-- Single container for Plyr -->
+            <div #plyrContainer class="plyr-container"></div>
+
+            <div class="no-video" *ngIf="!currentLesson.contentUrl && !currentLesson.ContentUrl">
+              <i class="fas fa-video-slash"></i>
+              <p>No video URL provided</p>
+            </div>
+
+            <!-- Lesson Completion Message -->
+            <div class="completion-overlay" *ngIf="showCompletionMessage">
+              <div class="completion-message">
+                <i class="fas fa-check-circle"></i>
+                <h3>Lesson Completed!</h3>
+                <p>Moving to next lesson...</p>
+              </div>
+            </div>
+
+            <!-- Auto-completion Progress (for Iframe fallback) -->
+            <div class="iframe-watch-status" *ngIf="isWatchingIframe && !isLessonCompleted(currentLesson)">
+              <div class="status-content">
+                <i class="fas fa-clock"></i>
+                <span>Auto-completing in {{ currentLesson.durationMinutes || 1 }} min...</span>
+                <div class="mini-progress-bar">
+                  <div class="mini-progress-fill" [style.width.%]="autoCompleteProgress"></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Google Drive Troubleshooting Bar (Subtle) -->
+            <div class="drive-warning"
+              *ngIf="isGoogleDriveUrl(currentLesson.contentUrl || currentLesson.ContentUrl) && !isLessonCompleted(currentLesson)">
+              <div class="warning-text">
+                <i class="fas fa-info-circle"></i>
+                <span>Issues with this video?</span>
+              </div>
+              <div class="warning-actions">
+                <button (click)="switchToGoogleDriveIframe(currentLesson.contentUrl || currentLesson.ContentUrl)"
+                  class="mini-btn">
+                  <i class="fas fa-sync"></i> Reload Player
+                </button>
+                <a [href]="currentLesson.contentUrl || currentLesson.ContentUrl" target="_blank" class="mini-btn alt">
+                  <i class="fas fa-external-link-alt"></i> Open in New Tab
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Article Content -->
+        <div class="content-article" *ngIf="isContentType(currentLesson, 'TEXT')">
+          <div class="article-content">
+            <p *ngIf="currentLesson.description">{{ currentLesson.description }}</p>
+            <a [href]="currentLesson.contentUrl" target="_blank" class="article-link" *ngIf="currentLesson.contentUrl">
+              <i class="fas fa-external-link-alt"></i>
+              Read Full Article
+            </a>
+          </div>
+        </div>
+
+        <!-- PDF Content -->
+        <div class="content-pdf" *ngIf="isContentType(currentLesson, 'DOCUMENT')">
+          <div class="pdf-placeholder">
+            <i class="fas fa-file-pdf"></i>
+            <p>PDF Document</p>
+            <a [href]="currentLesson.contentUrl" target="_blank" class="pdf-link" *ngIf="currentLesson.contentUrl">
+              <i class="fas fa-download"></i>
+              Download PDF
+            </a>
+          </div>
+        </div>
+
+        <!-- Quiz Content -->
+        <div class="content-quiz" *ngIf="isContentType(currentLesson, 'QUIZ')">
+          <div class="quiz-placeholder">
+            <i class="fas fa-question-circle"></i>
+            <p>Quiz</p>
+            <a [href]="currentLesson.contentUrl" target="_blank" class="quiz-link" *ngIf="currentLesson.contentUrl">
+              <i class="fas fa-external-link-alt"></i>
+              Take Quiz
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Player Controls -->
+      <div class="player-controls">
+        <button class="control-btn prev" (click)="previousLesson()" [disabled]="currentIndex === 0">
+          <i class="fas fa-chevron-left"></i>
+          Previous
+        </button>
+
+        <button class="control-btn complete" (click)="markLessonComplete()"
+          [disabled]="isLessonCompleted(currentLesson)">
+          <i class="fas fa-check"></i>
+          {{ isLessonCompleted(currentLesson) ? 'Completed' : 'Mark as Complete' }}
+        </button>
+
+        <button class="control-btn next" (click)="nextLesson()" [disabled]="currentIndex === lessons.length - 1">
+          Next
+          <i class="fas fa-chevron-right"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Course Completion Message -->
+  <div class="completion-modal" *ngIf="showCertificateMessage">
+    <div class="completion-modal-overlay" (click)="closeCompletionMessage()"></div>
+    <div class="completion-modal-content">
+      <button class="close-btn" (click)="closeCompletionMessage()">
+        <i class="fas fa-times"></i>
+      </button>
+
+      <div class="completion-body">
+        <div class="completion-icon">
+          <i class="fas fa-trophy"></i>
+        </div>
+        <h2>🎉 Congratulations!</h2>
+        <p>{{ certificateMessage }}</p>
+        
+        <div class="completion-actions">
+          <button class="dashboard-btn" (click)="goToDashboard()">
+            <i class="fas fa-tachometer-alt"></i>
+            Go to Student Dashboard
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- No Lessons State -->
+  <div class="no-lessons" *ngIf="!loading && lessons.length === 0">
+    <div class="empty-icon">
+      <i class="fas fa-video-slash"></i>
+    </div>
+    <h3>No lessons available</h3>
+    <p>This course doesn't have any content yet.</p>
+    <button class="primary-btn" (click)="goBack()">
+      <i class="fas fa-arrow-left"></i>
+      Back to Dashboard
+    </button>
+  </div>
+
+  <!-- Quiz Locked Modal -->
+  <div class="quiz-modal" *ngIf="showQuizLockedModal">
+    <div class="quiz-modal-overlay" (click)="closeQuizLockedModal()"></div>
+    <div class="quiz-modal-content">
+      <div class="quiz-modal-header">
+        <h2>Quiz Unavailable</h2>
+        <button class="close-btn" (click)="closeQuizLockedModal()">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      <div class="quiz-modal-body">
+        <div class="quiz-locked-message">
+          <i class="fas fa-lock"></i>
+          <p>{{ quizLockedMessage }}</p>
+        </div>
+        <div class="quiz-modal-actions">
+          <button class="close-btn" (click)="closeQuizLockedModal()">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Quiz Modal -->
+  <div class="quiz-modal" *ngIf="showQuizModal">
+    <div class="quiz-modal-overlay" (click)="closeQuizModal()"></div>
+    <div class="quiz-modal-content">
+      <div class="quiz-modal-header">
+        <h2>{{ currentQuiz?.title }}</h2>
+        <button class="close-btn" (click)="closeQuizModal()">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+
+      <div class="quiz-modal-body" *ngIf="!quizSubmitted">
+        <p class="quiz-description" *ngIf="currentQuiz?.description">{{ currentQuiz.description }}</p>
+        <div class="quiz-info">
+          <div class="timer-container" [class.warning]="quizTimeRemaining <= 60" [class.danger]="quizTimeRemaining <= 10">
+            <i class="fas fa-clock"></i>
+            <span class="time-display">{{ formatTime(quizTimeRemaining) }}</span>
+            <span class="time-label">Time Remaining</span>
+          </div>
+          <span><i class="fas fa-check-circle"></i> {{ currentQuiz?.passingScore }}% to pass</span>
+        </div>
+
+        <div class="quiz-loading" *ngIf="!currentQuiz?.questions">
+          <div class="loading-spinner">
+            <div class="spinner"></div>
+          </div>
+          <p>Loading quiz questions...</p>
+        </div>
+
+        <div class="quiz-no-questions"
+          *ngIf="currentQuiz?.questions !== undefined && currentQuiz?.questions?.length === 0">
+          <i class="fas fa-exclamation-triangle"></i>
+          <h3>No questions available</h3>
+          <p>This quiz doesn't have any questions yet. Please contact the instructor.</p>
+        </div>
+
+        <div class="quiz-questions" *ngIf="currentQuiz?.questions && currentQuiz?.questions?.length > 0">
+          <div class="question-item" *ngFor="let question of currentQuiz.questions; let qIndex = index">
+            <h4 class="question-text">{{ qIndex + 1 }}. {{ question.questionText }}</h4>
+            <div class="question-options">
+              <div class="option-item" *ngFor="let option of question.options; let oIndex = index"
+                [class.selected]="quizAnswers[question.questionId] === oIndex"
+                (click)="selectAnswer(question.questionId, oIndex)">
+                <span class="option-label">{{ getOptionLabel(oIndex) }}</span>
+                <span class="option-text">{{ option }}</span>
+                <i class="fas fa-check-circle selected-icon" *ngIf="quizAnswers[question.questionId] === oIndex"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="quiz-modal-actions" *ngIf="currentQuiz?.questions && currentQuiz?.questions?.length > 0">
+          <button class="cancel-btn" (click)="closeQuizModal()">Cancel</button>
+          <button class="submit-btn" (click)="submitQuiz()"
+            [disabled]="getAnswerCount() < currentQuiz?.questions?.length">
+            Submit Quiz
+          </button>
+        </div>
+      </div>
+
+      <div class="quiz-result" *ngIf="quizSubmitted">
+        <div class="result-icon" [class.passed]="quizPassed" [class.failed]="!quizPassed">
+          <i class="fas" [ngClass]="quizPassed ? 'fa-check-circle' : 'fa-times-circle'"></i>
+        </div>
+        <h3>{{ quizPassed ? 'Quiz Passed!' : 'Quiz Failed' }}</h3>
+        <p class="score-display">Your Score: {{ quizScore }}%</p>
+        <p class="passing-score">Passing Score: {{ currentQuiz?.passingScore }}%</p>
+        <button class="close-btn" (click)="closeQuizModal()">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Loading Template -->
+<ng-template #loadingTemplate>
+  <div class="loading-container">
+    <div class="loading-spinner">
+      <i class="fas fa-spinner fa-spin"></i>
+    </div>
+    <p class="loading-text">Loading course content...</p>
+  </div>
+</ng-template>

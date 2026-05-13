@@ -1,0 +1,136 @@
+<div class="instructor-dashboard" *ngIf="!loading; else loadingTemplate">
+  <!-- Dashboard Header -->
+  <div class="dashboard-header">
+    <div class="welcome-content">
+      <div class="welcome-text">
+        <h1 class="welcome-title">Welcome back, {{ currentUser?.fullName }}!</h1>
+        <p class="welcome-subtitle">Manage your courses and track your teaching performance</p>
+      </div>
+      <div class="user-avatar">
+        <div class="avatar-circle">
+          <i class="fas fa-chalkboard-teacher"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Quick Actions -->
+  <div class="quick-actions-section">
+    <div class="actions-grid">
+      <button class="action-btn primary" (click)="createCourse()">
+        <i class="fas fa-plus"></i>
+        Create New Course
+      </button>
+    </div>
+  </div>
+
+  <!-- Stats Overview -->
+  <div class="stats-section">
+    <div class="stats-grid">
+      <div class="stat-card courses">
+        <div class="stat-icon">
+          <i class="fas fa-chalkboard"></i>
+        </div>
+        <div class="stat-info">
+          <h3 class="stat-number">{{ stats.totalCourses }}</h3>
+          <p class="stat-label">My Courses</p>
+        </div>
+      </div>
+      
+      <div class="stat-card rating">
+        <div class="stat-icon">
+          <i class="fas fa-star"></i>
+        </div>
+        <div class="stat-info">
+          <h3 class="stat-number">{{ stats.averageRating }}</h3>
+          <p class="stat-label">Average Rating</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Dashboard Content -->
+  <div class="dashboard-content">
+    <div class="content-grid">
+      <!-- My Courses Section -->
+      <div class="section-card">
+        <div class="section-header">
+          <div class="section-title">
+            <i class="fas fa-chalkboard"></i>
+            <h2>My Courses</h2>
+          </div>
+          <button class="create-course-btn" (click)="createCourse()">
+            <i class="fas fa-plus"></i>
+            New Course
+          </button>
+        </div>
+        
+        <div class="courses-container" *ngIf="myCourses.length > 0; else noCourses">
+          <div class="courses-grid">
+            <div class="course-card" *ngFor="let course of myCourses">
+              <div class="course-header">
+                <div class="course-thumbnail">
+                  <i class="fas fa-chalkboard"></i>
+                </div>
+                <div class="course-status" [ngClass]="(course.isPublished || course.IsPublished) ? 'published' : ((course.isSubmittedForReview || course.IsSubmittedForReview) ? 'review' : 'draft')">
+                  {{ (course.isPublished || course.IsPublished) ? 'Published' : ((course.isSubmittedForReview || course.IsSubmittedForReview) ? 'In Review' : 'Draft') }}
+                </div>
+              </div>
+              
+              <div class="course-body">
+                <h3 class="course-title">{{ course.title }}</h3>
+                <div class="course-stats">
+                  <span class="stat-item">
+                    <i class="fas fa-users"></i>
+                    {{ course.enrollmentCount || 0 }} students
+                  </span>
+                  <span class="stat-item">
+                    <i class="fas fa-star"></i>
+                    {{ course.rating || 0 }}
+                  </span>
+                </div>
+                <div class="course-meta">
+                  <span class="course-price">${{ course.price || 0 }}</span>
+                  <span class="course-level">{{ course.level }}</span>
+                </div>
+              </div>
+              
+              <div class="course-footer">
+                <button class="edit-btn" (click)="editCourse(course.courseId); $event.stopPropagation()">
+                  <i class="fas fa-edit"></i>
+                  Edit
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <ng-template #noCourses>
+          <div class="empty-state">
+            <div class="empty-icon">
+              <i class="fas fa-chalkboard"></i>
+            </div>
+            <h3>No courses created yet</h3>
+            <p>Start sharing your knowledge by creating your first course</p>
+            <button class="primary-btn" (click)="createCourse()">
+              <i class="fas fa-plus"></i>
+              Create Your First Course
+            </button>
+          </div>
+        </ng-template>
+      </div>
+
+
+    </div>
+  </div>
+</div>
+
+<!-- Loading Template -->
+<ng-template #loadingTemplate>
+  <div class="loading-container">
+    <div class="loading-spinner">
+      <div class="spinner"></div>
+    </div>
+    <p class="loading-text">Loading your dashboard...</p>
+  </div>
+</ng-template>
