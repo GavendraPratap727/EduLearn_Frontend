@@ -1,0 +1,79 @@
+<nav class="premium-navbar" [class.scrolled]="isScrolled">
+  <div class="nav-container">
+    
+    <!-- Left: Brand -->
+    <div class="nav-brand" (click)="navigateTo('/')">
+      <div class="brand-logo-circle">
+        <i class="fas fa-graduation-cap"></i>
+      </div>
+      <span class="brand-text">EduLearn</span>
+    </div>
+
+    <!-- Center: Links (Desktop) -->
+    <div class="nav-links-desktop">
+      <a class="nav-link" (click)="navigateTo('/')">
+        <i class="fas fa-home"></i> Home
+      </a>
+      <a class="nav-link" (click)="navigateTo('/courses')">
+        <i class="fas fa-book-open"></i> Courses
+      </a>
+      <a class="nav-link" (click)="navigateTo('/dashboard')" *ngIf="isLoggedIn()">
+        <i class="fas fa-chart-line"></i> Dashboard
+      </a>
+      <a class="nav-link" (click)="navigateTo('/verify-certificate')">
+        <i class="fas fa-certificate"></i> Verify Certificate
+      </a>
+          </div>
+
+    <!-- Right: Auth or User Profile -->
+    <div class="nav-actions">
+      <!-- Guest -->
+      <ng-container *ngIf="!isLoggedIn()">
+        <button class="nav-btn-outline" (click)="navigateTo('/login')">Sign In</button>
+        <button class="nav-btn-solid" (click)="navigateTo('/register')">Get Started</button>
+      </ng-container>
+
+      <!-- Logged In -->
+      <ng-container *ngIf="isLoggedIn()">
+        <div class="user-profile-menu">
+          <div class="user-avatar-small">
+            <i class="fas fa-user"></i>
+          </div>
+          <div class="user-details">
+            <span class="user-name">{{ currentUser?.fullName || currentUser?.username || 'User' }}</span>
+            <span class="user-role">{{ getUserRole() }}</span>
+          </div>
+          <button class="nav-btn-icon" (click)="logout()" title="Sign Out">
+            <i class="fas fa-sign-out-alt"></i>
+          </button>
+        </div>
+      </ng-container>
+
+      <!-- Mobile Toggle -->
+      <button class="mobile-menu-toggle" (click)="toggleMobileMenu()">
+        <i class="fas" [ngClass]="isMobileMenuOpen ? 'fa-times' : 'fa-bars'"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- Mobile Menu Dropdown -->
+  <div class="mobile-menu-dropdown" [class.open]="isMobileMenuOpen">
+    <a class="mobile-link" (click)="navigateTo('/')"><i class="fas fa-home"></i> Home</a>
+    <a class="mobile-link" (click)="navigateTo('/courses')"><i class="fas fa-book-open"></i> Courses</a>
+    <a class="mobile-link" (click)="navigateTo('/dashboard')" *ngIf="isLoggedIn()"><i class="fas fa-chart-line"></i> Dashboard</a>
+    <a class="mobile-link" (click)="navigateTo('/verify-certificate')"><i class="fas fa-certificate"></i> Verify Certificate</a>
+        
+    <div class="mobile-auth-divider"></div>
+    
+    <div class="mobile-auth-actions" *ngIf="!isLoggedIn()">
+      <button class="mobile-btn-outline" (click)="navigateTo('/login')">Sign In</button>
+      <button class="mobile-btn-solid" (click)="navigateTo('/register')">Get Started</button>
+    </div>
+    
+    <div class="mobile-user-section" *ngIf="isLoggedIn()">
+      <button class="mobile-btn-solid danger" (click)="logout()">
+        <i class="fas fa-sign-out-alt"></i> Sign Out
+      </button>
+    </div>
+  </div>
+</nav>

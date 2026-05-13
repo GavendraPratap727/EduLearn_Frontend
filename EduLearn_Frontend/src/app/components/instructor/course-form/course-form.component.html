@@ -1,0 +1,263 @@
+<div class="course-form-container">
+  <!-- Loading State -->
+  <div class="loading-container" *ngIf="loading">
+    <div class="loading-spinner">
+      <div class="spinner"></div>
+    </div>
+    <p class="loading-text">Loading course...</p>
+  </div>
+
+  <!-- Form Content -->
+  <div class="form-content" *ngIf="!loading">
+    <div class="form-header">
+      <button class="back-btn" (click)="cancel()">
+        <i class="fas fa-arrow-left"></i>
+        Back to Dashboard
+      </button>
+      <h1 class="form-title">{{ isEdit ? 'Edit Course' : 'Create New Course' }}</h1>
+      <p class="form-subtitle">{{ isEdit ? 'Update your course details' : 'Share your knowledge with the world' }}</p>
+    </div>
+
+    <!-- Error Message -->
+    <div class="error-message" *ngIf="error">
+      <i class="fas fa-exclamation-circle"></i>
+      {{ error }}
+    </div>
+
+    <form (ngSubmit)="saveCourse()" class="course-form">
+      <!-- Basic Information -->
+      <div class="form-section">
+        <h2 class="section-title">
+          <i class="fas fa-info-circle"></i>
+          Basic Information
+        </h2>
+        
+        <div class="form-group">
+          <label for="title">Course Title *</label>
+          <input 
+            type="text" 
+            id="title" 
+            [(ngModel)]="course.title" 
+            name="title" 
+            required
+            placeholder="Enter course title">
+        </div>
+
+        <div class="form-group">
+          <label for="description">Description *</label>
+          <textarea 
+            id="description" 
+            [(ngModel)]="course.description" 
+            name="description" 
+            required
+            rows="4"
+            placeholder="Describe what students will learn"></textarea>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="category">Category *</label>
+            <select id="category" [(ngModel)]="course.category" name="category" required>
+              <option value="">Select Category</option>
+              <option *ngFor="let cat of categories" [value]="cat">{{ cat }}</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="level">Level *</label>
+            <select id="level" [(ngModel)]="course.level" name="level" required>
+              <option *ngFor="let level of levels" [value]="level.value">{{ level.label }}</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="price">Price (USD) *</label>
+            <input 
+              type="number" 
+              id="price" 
+              [(ngModel)]="course.price" 
+              name="price" 
+              required
+              min="0"
+              placeholder="0 for free">
+          </div>
+
+          <div class="form-group">
+            <label for="duration">Duration</label>
+            <input 
+              type="text" 
+              id="duration" 
+              [(ngModel)]="course.duration" 
+              name="duration"
+              placeholder="e.g., 10 hours">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="language">Language</label>
+          <select id="language" [(ngModel)]="course.language" name="language">
+            <option *ngFor="let lang of languages" [value]="lang">{{ lang }}</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Learning Outcomes -->
+      <div class="form-section">
+        <h2 class="section-title">
+          <i class="fas fa-graduation-cap"></i>
+          Learning Outcomes
+        </h2>
+        <p class="section-help">What will students learn from this course?</p>
+        
+        <div class="dynamic-list">
+          <div class="list-item" *ngFor="let outcome of course.learningOutcomes; let i = index; trackBy: trackByIndex">
+            <input 
+              type="text" 
+              [(ngModel)]="course.learningOutcomes[i]" 
+              [name]="'outcome' + i"
+              placeholder="e.g., Build full-stack applications">
+            <button 
+              type="button" 
+              class="remove-btn" 
+              (click)="removeArrayItem('learningOutcomes', i)"
+              *ngIf="course.learningOutcomes.length > 1">
+              <i class="fas fa-trash"></i>
+            </button>
+          </div>
+          <button type="button" class="add-btn" (click)="addArrayItem('learningOutcomes')">
+            <i class="fas fa-plus"></i>
+            Add Learning Outcome
+          </button>
+        </div>
+      </div>
+
+      <!-- Requirements -->
+      <div class="form-section">
+        <h2 class="section-title">
+          <i class="fas fa-list-check"></i>
+          Requirements
+        </h2>
+        <p class="section-help">What should students know before taking this course?</p>
+        
+        <div class="dynamic-list">
+          <div class="list-item" *ngFor="let req of course.requirements; let i = index; trackBy: trackByIndex">
+            <input 
+              type="text" 
+              [(ngModel)]="course.requirements[i]" 
+              [name]="'req' + i"
+              placeholder="e.g., Basic JavaScript knowledge">
+            <button 
+              type="button" 
+              class="remove-btn" 
+              (click)="removeArrayItem('requirements', i)"
+              *ngIf="course.requirements.length > 1">
+              <i class="fas fa-trash"></i>
+            </button>
+          </div>
+          <button type="button" class="add-btn" (click)="addArrayItem('requirements')">
+            <i class="fas fa-plus"></i>
+            Add Requirement
+          </button>
+        </div>
+      </div>
+
+      <!-- Tags -->
+      <div class="form-section">
+        <h2 class="section-title">
+          <i class="fas fa-tags"></i>
+          Tags
+        </h2>
+        <p class="section-help">Add relevant tags to help students find your course</p>
+        
+        <div class="dynamic-list">
+          <div class="list-item" *ngFor="let tag of course.tags; let i = index; trackBy: trackByIndex">
+            <input 
+              type="text" 
+              [(ngModel)]="course.tags[i]" 
+              [name]="'tag' + i"
+              placeholder="e.g., React, JavaScript">
+            <button 
+              type="button" 
+              class="remove-btn" 
+              (click)="removeArrayItem('tags', i)"
+              *ngIf="course.tags.length > 1">
+              <i class="fas fa-trash"></i>
+            </button>
+          </div>
+          <button type="button" class="add-btn" (click)="addArrayItem('tags')">
+            <i class="fas fa-plus"></i>
+            Add Tag
+          </button>
+        </div>
+      </div>
+
+      <!-- Status Badges -->
+      <div class="status-badge" *ngIf="isEdit">
+        <span class="badge" [class.published]="course.isPublished" [class.draft]="!course.isPublished && !course.isSubmittedForReview">
+          {{ course.isPublished ? 'Published' : (course.isSubmittedForReview ? 'In Review' : 'Draft') }}
+        </span>
+        <span class="badge review" *ngIf="course.isSubmittedForReview && !course.isApproved">
+          <i class="fas fa-search"></i> In Review
+        </span>
+        <span class="badge approved" *ngIf="course.isApproved">
+          <i class="fas fa-check-circle"></i> Approved
+        </span>
+        <span class="badge finished" *ngIf="course.isFinished">
+          <i class="fas fa-flag-checkered"></i> Finished
+        </span>
+      </div>
+
+      <!-- Form Actions -->
+      <div class="form-actions">
+        <button type="button" class="cancel-btn" (click)="cancel()">Cancel</button>
+        
+        <div class="primary-actions">
+          <button 
+            type="button" 
+            class="finish-btn" 
+            (click)="finishCourse()"
+            *ngIf="isEdit && course.isPublished && !course.isFinished"
+            [disabled]="saving">
+            <i class="fas fa-flag-checkered"></i>
+            {{ saving ? 'Finishing...' : 'Finish Course' }}
+          </button>
+
+          <div class="publish-wrapper" *ngIf="isEdit && !course.isPublished">
+            <button 
+              type="button" 
+              class="publish-btn" 
+              (click)="publishCourse()"
+              [disabled]="saving || course.isSubmittedForReview"
+              [class.review-mode]="course.isSubmittedForReview">
+              <i class="fas" [ngClass]="course.isSubmittedForReview ? 'fa-clock' : 'fa-paper-plane'"></i>
+              {{ saving ? 'Processing...' : (course.isSubmittedForReview ? 'Awaiting Approval' : 'Submit for Review') }}
+            </button>
+            <p class="publish-hint" *ngIf="course.isSubmittedForReview">
+              Admin will review your course soon.
+            </p>
+          </div>
+          
+          <button 
+            type="submit" 
+            class="save-btn" 
+            [disabled]="saving">
+            <i class="fas fa-save"></i>
+            {{ saving ? 'Saving...' : (isEdit ? 'Update Course' : 'Create Course') }}
+          </button>
+        </div>
+      </div>
+    </form>
+
+    <!-- Lesson Management (only for edit mode) - outside form to prevent form submission -->
+    <div class="form-section" *ngIf="isEdit">
+      <h2 class="section-title">
+        <i class="fas fa-video"></i>
+        Course Content
+      </h2>
+      <p class="section-help">Add lessons to build your course curriculum</p>
+      <app-lesson-manager [courseId]="courseId"></app-lesson-manager>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,329 @@
+<div class="student-dashboard" *ngIf="!loading; else loadingTemplate">
+  <!-- Dashboard Header -->
+  <div class="dashboard-header">
+    <div class="welcome-content">
+      <div class="welcome-text">
+        <h1 class="welcome-title">Welcome back, {{ currentUser?.fullName }}!</h1>
+        <p class="welcome-subtitle">Continue your learning journey and track your progress</p>
+      </div>
+      <div class="user-avatar">
+        <div class="avatar-circle">
+          <i class="fas fa-user-graduate"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Stats Overview -->
+  <div class="stats-section">
+    <div class="stats-grid">
+      <div class="stat-card enrolled">
+        <div class="stat-icon">
+          <i class="fas fa-book-open"></i>
+        </div>
+        <div class="stat-info">
+          <h3 class="stat-number">{{ stats.totalEnrollments }}</h3>
+          <p class="stat-label">Enrolled Courses</p>
+        </div>
+      </div>
+      
+      <div class="stat-card progress">
+        <div class="stat-icon">
+          <i class="fas fa-play-circle"></i>
+        </div>
+        <div class="stat-info">
+          <h3 class="stat-number">{{ stats.inProgressCourses }}</h3>
+          <p class="stat-label">In Progress</p>
+        </div>
+      </div>
+      
+      <div class="stat-card completed">
+        <div class="stat-icon">
+          <i class="fas fa-check-circle"></i>
+        </div>
+        <div class="stat-info">
+          <h3 class="stat-number">{{ stats.completedCourses }}</h3>
+          <p class="stat-label">Completed</p>
+        </div>
+      </div>
+      
+
+    </div>
+  </div>
+
+  <!-- Main Dashboard Content -->
+  <div class="dashboard-content">
+    <div class="content-grid">
+      <!-- My Courses Section -->
+      <div class="section-card">
+        <div class="section-header">
+          <div class="section-title">
+            <i class="fas fa-graduation-cap"></i>
+            <h2>My Courses</h2>
+          </div>
+          <button class="view-all-btn" (click)="navigateToCourses()">
+            View All
+            <i class="fas fa-arrow-right"></i>
+          </button>
+        </div>
+        
+        <div class="courses-container" *ngIf="enrolledCourses.length > 0; else noCourses">
+          <div class="courses-grid">
+            <ng-container *ngFor="let course of enrolledCourses.slice(0, 4)">
+            <div class="course-card" (click)="continueCourse(course?.courseId)" *ngIf="course && course?.title">
+              <div class="course-header">
+                <div class="course-thumbnail">
+                  <i class="fas fa-book"></i>
+                </div>
+                <div class="course-progress">
+                  <div class="progress-ring">
+                    <svg width="40" height="40">
+                      <circle cx="20" cy="20" r="16" stroke="#e5e7eb" stroke-width="3" fill="none"></circle>
+                      <circle cx="20" cy="20" r="16" stroke="#22c55e" stroke-width="3" fill="none"
+                              [attr.stroke-dasharray]="circumference"
+                              [attr.stroke-dashoffset]="circumference - (course?.progress || 0) / 100 * circumference"
+                              transform="rotate(-90 20 20)"></circle>
+                    </svg>
+                    <span class="progress-text">{{ course?.progress || 0 }}%</span>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="course-body">
+                <h3 class="course-title">{{ course?.title || 'Untitled Course' }}</h3>
+                <p class="course-instructor">{{ course?.instructor || 'Unknown Instructor' }}</p>
+                <div class="course-meta">
+                  <span class="course-level">{{ course?.level || 'Unknown Level' }}</span>
+                  <span class="course-duration">{{ course?.duration || 'Unknown Duration' }}</span>
+                </div>
+              </div>
+              
+              <div class="course-footer">
+                <ng-container *ngIf="!course?.isCompleted; else completedActions">
+                  <button class="continue-btn" (click)="continueCourse(course?.courseId)">
+                    <i class="fas fa-play"></i>
+                    Continue Learning
+                  </button>
+                </ng-container>
+                <ng-template #completedActions>
+                  <div class="completed-actions">
+                    <ng-container *ngIf="!course?.hasReviewed; else reviewedBtn">
+                      <button class="review-btn" (click)="rateCourse(course?.courseId); $event.stopPropagation()">
+                        <i class="fas fa-star"></i>
+                        Rate Course
+                      </button>
+                    </ng-container>
+                    <ng-template #reviewedBtn>
+                      <button class="review-btn reviewed-state" disabled (click)="$event.stopPropagation()">
+                        <i class="fas fa-check-circle"></i>
+                        Reviewed
+                      </button>
+                    </ng-template>
+                    <button class="cert-btn" (click)="downloadCertificate(course); $event.stopPropagation()" 
+                      [disabled]="!canDownloadCertificate(course)"
+                      [title]="!canDownloadCertificate(course) ? 'Complete all quizzes to unlock certificate' : 'Download Certificate'">
+                      <i class="fas fa-certificate"></i>
+                      Certificate
+                    </button>
+                  </div>
+                </ng-template>
+              </div>
+            </div>
+            </ng-container>
+          </div>
+        </div>
+        
+        <ng-template #noCourses>
+          <div class="empty-state">
+            <div class="empty-icon">
+              <i class="fas fa-book-open"></i>
+            </div>
+            <h3>No courses enrolled yet</h3>
+            <p>Start your learning journey by enrolling in a course</p>
+            <button class="primary-btn" (click)="navigateToCourses()">
+              <i class="fas fa-search"></i>
+              Browse Courses
+            </button>
+          </div>
+        </ng-template>
+      </div> <!-- Added closing tag for the My Courses section card -->
+
+
+      <!-- Recommended Courses Section -->
+      <div class="section-card full-width">
+        <div class="section-header">
+          <div class="section-title">
+            <i class="fas fa-lightbulb"></i>
+            <h2>Recommended for You</h2>
+          </div>
+          <button class="view-all-btn" (click)="navigateToCourses()">
+            View All
+            <i class="fas fa-arrow-right"></i>
+          </button>
+        </div>
+        
+        <div class="courses-container" *ngIf="recommendedCourses.length > 0; else noRecommended">
+          <div class="recommended-grid">
+            <div class="recommended-card" *ngFor="let course of recommendedCourses.slice(0, 3)" (click)="viewCourse(course.courseId)">
+              <div class="recommended-image">
+                <div class="course-thumbnail">
+                  <i class="fas fa-star"></i>
+                </div>
+                <div class="course-rating">
+                  <i class="fas fa-star"></i>
+                  <span>{{ course.rating }}</span>
+                </div>
+              </div>
+              
+              <div class="recommended-content">
+                <h3 class="course-title">{{ course.title }}</h3>
+                <p class="course-instructor">{{ course.instructor }}</p>
+                <div class="course-meta">
+                  <span class="course-level">{{ course.level }}</span>
+                  <span class="course-price">${{ course.price }}</span>
+                </div>
+              </div>
+              
+              <div class="recommended-footer">
+                <button 
+                  *ngIf="!isEnrolledInCourse(course.courseId)" 
+                  class="enroll-btn" 
+                  (click)="enrollInCourse(course.courseId); $event.stopPropagation()">
+                  <i class="fas fa-plus"></i>
+                  Enroll Now
+                </button>
+                <button 
+                  *ngIf="isEnrolledInCourse(course.courseId)" 
+                  class="enroll-btn enrolled" 
+                  disabled>
+                  <i class="fas fa-check"></i>
+                  Already Enrolled
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <ng-template #noRecommended>
+          <div class="empty-state">
+            <div class="empty-icon">
+              <i class="fas fa-lightbulb"></i>
+            </div>
+            <h3>No recommendations yet</h3>
+            <p>Browse courses to get personalized recommendations</p>
+          </div>
+        </ng-template>
+        </div>
+      </div>
+    </div>
+
+<!-- Certificate Modal -->
+<div class="certificate-modal" *ngIf="showCertificateModal">
+  <div class="certificate-modal-overlay" (click)="closeCertificateModal()"></div>
+  <div class="certificate-modal-content">
+    <button class="close-btn" (click)="closeCertificateModal()">
+      <i class="fas fa-times"></i>
+    </button>
+
+    <div class="certificate-body">
+      <div class="certificate-header">
+        <i class="fas fa-award"></i>
+        <h1>Certificate of Completion</h1>
+      </div>
+
+      <div class="certificate-content">
+        <p class="cert-text">This certifies that</p>
+        <h2 class="student-name">{{ certificateData.studentName }}</h2>
+        <p class="cert-text">has successfully completed the course</p>
+        <h3 class="course-name">{{ certificateData.courseName }}</h3>
+        <div class="cert-date">Completed on {{ certificateData.completionDate }}</div>
+                <div class="cert-score">Average Quiz Score: {{ certificateData.averageScore }}%</div>
+        <div class="cert-id">Certificate ID: {{ certificateData.certificateId }}</div>
+      </div>
+
+      <div class="certificate-actions">
+        <button class="cert-action-btn cert-download-btn" (click)="downloadCertificateFile()">
+          <i class="fas fa-download"></i>
+          <span>Download Certificate</span>
+        </button>
+        <button class="cert-action-btn cert-share-btn" (click)="shareCertificate()">
+          <i class="fas fa-share-alt"></i>
+          <span>Share Certificate</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Razorpay Payment Modal -->
+<app-razorpay-payment
+  *ngIf="showPaymentModal"
+  [courseId]="selectedCourseId"
+  [courseTitle]="selectedCourseTitle"
+  [amount]="selectedCoursePrice"
+  [isOpen]="showPaymentModal">
+</app-razorpay-payment>
+
+<!-- Loading Template -->
+<ng-template #loadingTemplate>
+  <div class="loading-container">
+    <div class="loading-spinner">
+      <div class="spinner"></div>
+    </div>
+    <p class="loading-text">Loading your dashboard...</p>
+  </div>
+</ng-template>
+
+<!-- Rating Modal -->
+<div class="rating-modal-overlay" *ngIf="showRatingModal" (click)="closeRatingModal()">
+  <div class="rating-modal-content animate-pop-in" (click)="$event.stopPropagation()">
+    <button class="rating-close-btn" (click)="closeRatingModal()">
+      <i class="fas fa-times"></i>
+    </button>
+    
+    <div class="rating-header">
+      <div class="rating-icon-wrap">
+        <i class="fas fa-star"></i>
+      </div>
+      <h2>Rate this Course</h2>
+      <p>How was your experience learning <strong>{{ ratingCourseTitle }}</strong>?</p>
+    </div>
+
+    <div class="rating-body">
+      <div class="stars-container" (mouseleave)="hoverRating = 0">
+        <i class="fas fa-star star-icon" 
+           *ngFor="let i of [1, 2, 3, 4, 5]"
+           [class.active]="i <= (hoverRating || selectedRating)"
+           (mouseenter)="hoverRating = i"
+           (click)="setRating(i)">
+        </i>
+      </div>
+      <div class="rating-text" [ngSwitch]="hoverRating || selectedRating">
+        <span *ngSwitchCase="1">Poor</span>
+        <span *ngSwitchCase="2">Fair</span>
+        <span *ngSwitchCase="3">Good</span>
+        <span *ngSwitchCase="4">Very Good</span>
+        <span *ngSwitchCase="5">Excellent!</span>
+        <span *ngSwitchDefault>Select a rating</span>
+      </div>
+
+      <div class="feedback-container" *ngIf="selectedRating > 0">
+        <label>Share your thoughts (optional)</label>
+        <textarea 
+          [(ngModel)]="ratingComment" 
+          placeholder="What did you like about this course? What could be improved?"
+          rows="4">
+        </textarea>
+      </div>
+    </div>
+
+    <div class="rating-footer">
+      <button class="btn-cancel" (click)="closeRatingModal()">Cancel</button>
+      <button class="btn-submit" 
+              [disabled]="selectedRating === 0" 
+              (click)="submitRating()">
+        Submit Rating
+      </button>
+    </div>
+  </div>
+</div>

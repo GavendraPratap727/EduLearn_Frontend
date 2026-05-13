@@ -1,0 +1,95 @@
+<div class="course-list-container">
+  <!-- Hero Section -->
+  <div class="hero-section">
+    <div class="hero-content">
+      <h1 class="hero-title">Explore Courses</h1>
+      <p class="hero-subtitle">Discover thousands of courses to enhance your skills</p>
+      
+      <div class="search-section">
+        <div class="search-wrapper">
+          <input
+            type="text"
+            class="search-input"
+            placeholder="Search courses..."
+            [(ngModel)]="searchTerm"
+            (input)="onSearchChange()"
+          />
+          <button class="search-btn">
+            <i class="fas fa-search"></i>
+          </button>
+        </div>
+      </div>
+
+      <div class="category-filters">
+        <button
+          *ngFor="let category of categories"
+          class="category-btn"
+          [class.active]="selectedCategory === category"
+          (click)="onCategoryChange(category)"
+        >
+          {{ category }}
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="loading" class="loading-container">
+    <div class="loading-spinner">
+      <div class="spinner"></div>
+    </div>
+    <p class="loading-text">Loading courses...</p>
+  </div>
+
+  <!-- Courses Grid -->
+  <div *ngIf="!loading" class="courses-section">
+    <div class="courses-grid">
+      <div
+        *ngFor="let course of filteredCourses; let i = index"
+        class="course-card"
+        (click)="viewCourse(course.courseId)"
+      >
+        <div class="course-header">
+          <div class="course-thumbnail">
+            <i class="fas fa-graduation-cap"></i>
+          </div>
+          <div class="course-category-badge">{{ course.category }}</div>
+        </div>
+        
+        <div class="course-body">
+          <h3 class="course-title">{{ course.title }}</h3>
+          <p class="course-description">{{ course.description }}</p>
+          
+          <div class="course-meta">
+            <span class="meta-item">
+              <i class="fas fa-users"></i> {{ course.enrollmentCount || 0 }}
+            </span>
+            <span class="meta-item">
+              <i class="fas fa-star"></i> {{ course.rating || 4.5 }}
+            </span>
+          </div>
+        </div>
+
+        <div class="course-footer">
+          <div class="course-price">
+            <span *ngIf="course.price === 0" class="free">Free</span>
+            <span *ngIf="course.price > 0" class="paid">₹{{ course.price }}</span>
+          </div>
+          <button class="view-btn" (click)="viewCourse(course.courseId); $event.stopPropagation()">
+            View Course
+            <i class="fas fa-arrow-right"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Empty State -->
+    <div *ngIf="filteredCourses.length === 0" class="empty-state">
+      <div class="empty-icon">
+        <i class="fas fa-search"></i>
+      </div>
+      <h3>No courses found</h3>
+      <p>Try adjusting your search or filter criteria</p>
+    </div>
+  </div>
+</div>

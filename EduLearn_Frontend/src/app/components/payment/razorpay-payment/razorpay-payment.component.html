@@ -1,0 +1,109 @@
+<!-- Payment Modal Overlay -->
+<div *ngIf="isOpen" class="payment-modal-overlay" (click)="closePaymentModal()">
+  <div class="payment-modal" (click)="$event.stopPropagation()">
+    
+    <!-- Modal Header -->
+    <div class="payment-header">
+      <div class="header-content">
+        <div class="header-icon">
+          <i class="fas fa-graduation-cap"></i>
+        </div>
+        <div class="header-text">
+          <h2>Enroll in Course</h2>
+          <p>Complete your enrollment to get started</p>
+        </div>
+      </div>
+      <button class="close-btn" (click)="closePaymentModal()" aria-label="Close">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+
+    <!-- Course Details -->
+    <div class="course-details">
+      <div class="course-card">
+        <div class="course-icon">
+          <i class="fas fa-book-open"></i>
+        </div>
+        <div class="course-info">
+          <h3>{{ courseTitle }}</h3>
+          <div class="course-features">
+            <span><i class="fas fa-check-circle"></i> Lifetime Access</span>
+            <span><i class="fas fa-check-circle"></i> Certificate</span>
+            <span><i class="fas fa-check-circle"></i> Support</span>
+          </div>
+        </div>
+        <div class="price-tag">
+          <span class="currency">₹</span>
+          <span class="amount">{{ amount }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Loading State -->
+    <div *ngIf="loading" class="loading-state">
+      <div class="loading-content">
+        <div class="spinner"></div>
+        <p>Processing your payment...</p>
+        <p class="loading-subtext">Please don't close this window</p>
+      </div>
+    </div>
+
+    <!-- Error State -->
+    <div *ngIf="error" class="error-state">
+      <div class="error-content">
+        <div class="error-icon">
+          <i class="fas fa-exclamation-circle"></i>
+        </div>
+        <h3>Payment Failed</h3>
+        <p class="error-message">{{ error }}</p>
+        <button class="retry-btn" (click)="retryPayment()" *ngIf="!loading">
+          <i class="fas fa-redo"></i>
+          Try Again
+        </button>
+      </div>
+    </div>
+
+    <!-- Payment Options (shown when not loading and no error) -->
+    <div *ngIf="!loading && !error" class="payment-options">
+      <div class="payment-methods">
+        <h4>Payment Method</h4>
+        <div class="payment-method active">
+          <div class="method-icon">
+            <i class="fas fa-credit-card"></i>
+          </div>
+          <div class="method-details">
+            <h5>Razorpay Secure Payment</h5>
+            <p>Cards, UPI, Net Banking, Wallets</p>
+          </div>
+          <div class="method-badge">
+            <i class="fas fa-shield-alt"></i>
+            Secure
+          </div>
+        </div>
+      </div>
+      
+      <div class="payment-summary">
+        <div class="summary-row">
+          <span>Course Price</span>
+          <span>₹{{ amount }}</span>
+        </div>
+        <div class="summary-row total">
+          <span>Total</span>
+          <span>₹{{ amount }}</span>
+        </div>
+      </div>
+      
+      <div class="payment-actions">
+        <button class="pay-btn" (click)="proceedToPayment()">
+          <i class="fas fa-lock"></i>
+          Pay ₹{{ amount }}
+        </button>
+        <p class="secure-text">
+          <i class="fas fa-shield-alt"></i>
+          Secured by Razorpay
+        </p>
+      </div>
+    </div>
+
+  </div>
+</div>

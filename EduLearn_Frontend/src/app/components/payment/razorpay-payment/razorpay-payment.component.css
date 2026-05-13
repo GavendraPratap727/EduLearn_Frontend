@@ -1,0 +1,887 @@
+/* Payment Modal Styles */
+
+.payment-modal-overlay {
+
+  position: fixed;
+
+  top: 0;
+
+  left: 0;
+
+  width: 100%;
+
+  height: 100%;
+
+  background-color: rgba(0, 0, 0, 0.6);
+
+  display: flex;
+
+  justify-content: center;
+
+  align-items: center;
+
+  z-index: 1000;
+
+  backdrop-filter: blur(8px);
+
+}
+
+
+
+.payment-modal {
+
+  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+
+  border-radius: 20px;
+
+  width: 90%;
+
+  max-width: 550px;
+
+  max-height: 90vh;
+
+  overflow-y: auto;
+
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+
+  animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+
+}
+
+
+
+@keyframes slideUp {
+
+  from {
+
+    opacity: 0;
+
+    transform: translateY(30px) scale(0.95);
+
+  }
+
+  to {
+
+    opacity: 1;
+
+    transform: translateY(0) scale(1);
+
+  }
+
+}
+
+
+
+/* Header Styles */
+
+.payment-header {
+
+  display: flex;
+
+  justify-content: space-between;
+
+  align-items: center;
+
+  padding: 28px 28px 20px;
+
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+
+  border-radius: 20px 20px 0 0;
+
+}
+
+
+
+.header-content {
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 16px;
+
+}
+
+
+
+.header-icon {
+
+  width: 48px;
+
+  height: 48px;
+
+  background: rgba(255, 255, 255, 0.2);
+
+  border-radius: 12px;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  color: white;
+
+  font-size: 20px;
+
+}
+
+
+
+.header-text h2 {
+
+  margin: 0;
+
+  font-size: 24px;
+
+  font-weight: 700;
+
+  color: white;
+
+}
+
+
+
+.header-text p {
+
+  margin: 4px 0 0 0;
+
+  font-size: 14px;
+
+  color: rgba(255, 255, 255, 0.9);
+
+}
+
+
+
+.close-btn {
+
+  background: rgba(255, 255, 255, 0.2);
+
+  border: none;
+
+  font-size: 18px;
+
+  color: white;
+
+  cursor: pointer;
+
+  padding: 10px;
+
+  border-radius: 10px;
+
+  transition: all 0.3s ease;
+
+}
+
+
+
+.close-btn:hover {
+
+  background: rgba(255, 255, 255, 0.3);
+
+  transform: rotate(90deg);
+
+}
+
+
+
+/* Course Details */
+
+.course-details {
+
+  padding: 20px 28px;
+
+}
+
+
+
+.course-card {
+
+  background: white;
+
+  border-radius: 16px;
+
+  padding: 20px;
+
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+
+  display: flex;
+
+  gap: 16px;
+
+  align-items: center;
+
+}
+
+
+
+.course-icon {
+
+  width: 56px;
+
+  height: 56px;
+
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+
+  border-radius: 12px;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  color: white;
+
+  font-size: 24px;
+
+  flex-shrink: 0;
+
+}
+
+
+
+.course-info {
+
+  flex: 1;
+
+}
+
+
+
+.course-info h3 {
+
+  margin: 0 0 8px 0;
+
+  font-size: 18px;
+
+  font-weight: 700;
+
+  color: #1f2937;
+
+  line-height: 1.3;
+
+}
+
+
+
+.course-features {
+
+  display: flex;
+
+  flex-wrap: wrap;
+
+  gap: 12px;
+
+}
+
+
+
+.course-features span {
+
+  font-size: 12px;
+
+  color: #6b7280;
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 4px;
+
+}
+
+
+
+.course-features i {
+
+  color: #10b981;
+
+  font-size: 12px;
+
+}
+
+
+
+.price-tag {
+
+  text-align: right;
+
+}
+
+
+
+.price-tag .currency {
+
+  font-size: 16px;
+
+  color: #6b7280;
+
+  font-weight: 500;
+
+}
+
+
+
+.price-tag .amount {
+
+  font-size: 28px;
+
+  font-weight: 800;
+
+  color: #667eea;
+
+}
+
+
+
+/* Loading State */
+
+.loading-state {
+
+  padding: 60px 28px;
+
+  text-align: center;
+
+}
+
+
+
+.loading-content .spinner {
+
+  width: 48px;
+
+  height: 48px;
+
+  border: 4px solid #e5e7eb;
+
+  border-top: 4px solid #667eea;
+
+  border-radius: 50%;
+
+  animation: spin 1s linear infinite;
+
+  margin: 0 auto 20px auto;
+
+}
+
+
+
+@keyframes spin {
+
+  0% { transform: rotate(0deg); }
+
+  100% { transform: rotate(360deg); }
+
+}
+
+
+
+.loading-content p {
+
+  margin: 0;
+
+  color: #6b7280;
+
+  font-size: 16px;
+
+  font-weight: 500;
+
+}
+
+
+
+.loading-subtext {
+
+  margin-top: 8px;
+
+  font-size: 14px;
+
+  color: #9ca3af;
+
+}
+
+
+
+/* Error State */
+
+.error-state {
+
+  padding: 60px 28px;
+
+  text-align: center;
+
+}
+
+
+
+.error-content {
+
+  background: #fef2f2;
+
+  border-radius: 16px;
+
+  padding: 32px;
+
+}
+
+
+
+.error-icon {
+
+  color: #ef4444;
+
+  font-size: 48px;
+
+  margin-bottom: 16px;
+
+}
+
+
+
+.error-content h3 {
+
+  margin: 0 0 12px 0;
+
+  font-size: 20px;
+
+  font-weight: 700;
+
+  color: #1f2937;
+
+}
+
+
+
+.error-message {
+
+  color: #6b7280;
+
+  font-size: 15px;
+
+  margin: 0 0 24px 0;
+
+  line-height: 1.5;
+
+}
+
+
+
+.retry-btn {
+
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+
+  color: white;
+
+  border: none;
+
+  padding: 14px 28px;
+
+  border-radius: 10px;
+
+  font-size: 16px;
+
+  font-weight: 600;
+
+  cursor: pointer;
+
+  display: inline-flex;
+
+  align-items: center;
+
+  gap: 8px;
+
+  transition: all 0.3s ease;
+
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+
+}
+
+
+
+.retry-btn:hover {
+
+  transform: translateY(-2px);
+
+  box-shadow: 0 6px 20px rgba(239, 68, 68, 0.4);
+
+}
+
+
+
+/* Payment Options */
+
+.payment-options {
+
+  padding: 20px 28px 28px;
+
+}
+
+
+
+/* Payment Methods */
+
+.payment-methods h4 {
+
+  margin: 0 0 16px 0;
+
+  font-size: 15px;
+
+  font-weight: 600;
+
+  color: #6b7280;
+
+  text-transform: uppercase;
+
+  letter-spacing: 0.5px;
+
+}
+
+
+
+.payment-method {
+
+  display: flex;
+
+  align-items: center;
+
+  padding: 20px;
+
+  border: 2px solid #e5e7eb;
+
+  border-radius: 12px;
+
+  margin-bottom: 0;
+
+  cursor: pointer;
+
+  transition: all 0.3s ease;
+
+  background: white;
+
+}
+
+
+
+.payment-method.active {
+
+  border-color: #667eea;
+
+  background: linear-gradient(135deg, #f5f3ff 0%, #ede9fe 100%);
+
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
+
+}
+
+
+
+.method-icon {
+
+  width: 48px;
+
+  height: 48px;
+
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+
+  color: white;
+
+  border-radius: 12px;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  margin-right: 16px;
+
+  font-size: 20px;
+
+}
+
+
+
+.method-details {
+
+  flex: 1;
+
+}
+
+
+
+.method-details h5 {
+
+  margin: 0 0 4px 0;
+
+  font-size: 16px;
+
+  font-weight: 700;
+
+  color: #1f2937;
+
+}
+
+
+
+.method-details p {
+
+  margin: 0;
+
+  font-size: 13px;
+
+  color: #6b7280;
+
+}
+
+
+
+.method-badge {
+
+  background: #d1fae5;
+
+  color: #059669;
+
+  padding: 6px 12px;
+
+  border-radius: 20px;
+
+  font-size: 12px;
+
+  font-weight: 600;
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 4px;
+
+}
+
+
+
+/* Payment Summary */
+
+.payment-summary {
+
+  margin: 24px 0;
+
+  padding: 20px;
+
+  background: #f8fafc;
+
+  border-radius: 12px;
+
+  border: 1px solid #e5e7eb;
+
+}
+
+
+
+.summary-row {
+
+  display: flex;
+
+  justify-content: space-between;
+
+  align-items: center;
+
+  margin-bottom: 12px;
+
+  font-size: 14px;
+
+  color: #6b7280;
+
+}
+
+
+
+.summary-row:last-child {
+
+  margin-bottom: 0;
+
+}
+
+
+
+.summary-row.total {
+
+  padding-top: 12px;
+
+  border-top: 2px dashed #e5e7eb;
+
+  font-weight: 700;
+
+  font-size: 18px;
+
+  color: #1f2937;
+
+}
+
+
+
+/* Pay Button */
+
+.pay-btn {
+
+  width: 100%;
+
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+
+  color: white;
+
+  border: none;
+
+  padding: 18px 24px;
+
+  border-radius: 12px;
+
+  font-size: 18px;
+
+  font-weight: 700;
+
+  cursor: pointer;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  gap: 10px;
+
+  transition: all 0.3s ease;
+
+  margin-bottom: 16px;
+
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+
+}
+
+
+
+.pay-btn:hover:not(:disabled) {
+
+  transform: translateY(-2px);
+
+  box-shadow: 0 8px 25px rgba(102, 126, 234, 0.5);
+
+}
+
+
+
+.pay-btn:disabled {
+
+  background: #9ca3af;
+
+  cursor: not-allowed;
+
+  transform: none;
+
+  box-shadow: none;
+
+}
+
+
+
+.secure-text {
+
+  text-align: center;
+
+  margin: 0;
+
+  font-size: 13px;
+
+  color: #6b7280;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  gap: 6px;
+
+}
+
+
+
+.secure-text i {
+
+  color: #10b981;
+
+}
+
+
+
+/* Responsive Design */
+
+@media (max-width: 640px) {
+
+  .payment-modal {
+
+    width: 95%;
+
+    margin: 20px;
+
+    border-radius: 16px;
+
+  }
+
+  
+
+  .payment-header {
+
+    padding: 20px 20px 16px;
+
+    border-radius: 16px 16px 0 0;
+
+  }
+
+  
+
+  .header-text h2 {
+
+    font-size: 20px;
+
+  }
+
+  
+
+  .course-details,
+
+  .payment-options {
+
+    padding: 16px 20px 20px;
+
+  }
+
+  
+
+  .course-card {
+
+    flex-direction: column;
+
+    text-align: center;
+
+  }
+
+  
+
+  .course-features {
+
+    justify-content: center;
+
+  }
+
+  
+
+  .price-tag {
+
+    text-align: center;
+
+    margin-top: 12px;
+
+  }
+
+}

@@ -1,0 +1,156 @@
+<div class="signup-page">
+  <div class="signup-background">
+    <div class="floating-shapes">
+      <div class="shape shape-1"></div>
+      <div class="shape shape-2"></div>
+      <div class="shape shape-3"></div>
+      <div class="shape shape-4"></div>
+    </div>
+  </div>
+
+  <div class="signup-container">
+    <div class="signup-card">
+      <!-- Header -->
+      <div class="signup-header">
+        <div class="logo-container">
+          <div class="logo">
+            <i class="fas fa-graduation-cap"></i>
+          </div>
+        </div>
+        <h1 class="signup-title">Join EduLearn</h1>
+        <p class="signup-subtitle">Start your learning journey today</p>
+      </div>
+
+      <!-- Form -->
+      <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" class="signup-form">
+        <!-- Full Name -->
+        <div class="input-group">
+          <label class="input-label">
+            <i class="fas fa-user"></i>
+            Full Name
+          </label>
+          <div class="input-wrapper">
+            <input
+              type="text"
+              class="input-field"
+              formControlName="fullName"
+              placeholder="John Doe"
+              autocomplete="name"
+            />
+            <div class="input-border"></div>
+          </div>
+          <div *ngIf="registerForm.get('fullName')?.touched && registerForm.get('fullName')?.invalid" class="error-text">
+            <i class="fas fa-exclamation-circle"></i>
+            Please enter your full name
+          </div>
+        </div>
+
+        <!-- Email -->
+        <div class="input-group">
+          <label class="input-label">
+            <i class="fas fa-envelope"></i>
+            Email Address
+          </label>
+          <div class="input-wrapper">
+            <input
+              type="email"
+              class="input-field"
+              formControlName="email"
+              placeholder="john@example.com"
+              autocomplete="email"
+            />
+            <div class="input-border"></div>
+          </div>
+          <div *ngIf="registerForm.get('email')?.touched && registerForm.get('email')?.invalid" class="error-text">
+            <i class="fas fa-exclamation-circle"></i>
+            Please enter a valid email address
+          </div>
+        </div>
+
+        <!-- Password -->
+        <div class="input-group">
+          <label class="input-label">
+            <i class="fas fa-lock"></i>
+            Password
+          </label>
+          <div class="input-wrapper">
+            <input
+              type="password"
+              class="input-field"
+              formControlName="password"
+              placeholder="Create a strong password"
+              autocomplete="new-password"
+            />
+            <div class="input-border"></div>
+          </div>
+          <div *ngIf="registerForm.get('password')?.touched && registerForm.get('password')?.invalid" class="error-text">
+            <i class="fas fa-exclamation-circle"></i>
+            Password must be at least 6 characters
+          </div>
+        </div>
+
+        <!-- Confirm Password -->
+        <div class="input-group">
+          <label class="input-label">
+            <i class="fas fa-lock"></i>
+            Confirm Password
+          </label>
+          <div class="input-wrapper">
+            <input
+              type="password"
+              class="input-field"
+              formControlName="confirmPassword"
+              placeholder="Confirm your password"
+              autocomplete="new-password"
+            />
+            <div class="input-border"></div>
+          </div>
+          <div *ngIf="registerForm.get('confirmPassword')?.touched && registerForm.get('confirmPassword')?.invalid" class="error-text">
+            <i class="fas fa-exclamation-circle"></i>
+            Passwords do not match
+          </div>
+          <div *ngIf="registerForm.hasError('mismatch')" class="error-text">
+            <i class="fas fa-exclamation-circle"></i>
+            Passwords do not match
+          </div>
+        </div>
+
+        <!-- Error Banner -->
+        <div *ngIf="errorMessage" class="error-banner">
+          <i class="fas fa-exclamation-triangle"></i>
+          <span>{{ errorMessage }}</span>
+        </div>
+
+        <!-- Submit Button -->
+        <button
+          type="submit"
+          class="submit-btn"
+          [disabled]="loading"
+          [class.loading]="loading"
+        >
+          <span *ngIf="!loading" class="btn-content">
+            <i class="fas fa-rocket"></i>
+            Create Account
+          </span>
+          <span *ngIf="loading" class="loading-content">
+            <div class="spinner"></div>
+            Creating account...
+          </span>
+        </button>
+      </form>
+
+      <!-- Footer -->
+      <div class="signup-footer">
+        <div class="divider">
+          <span>or</span>
+        </div>
+        <p class="login-prompt">
+          Already have an account?
+          <button class="login-link" (click)="navigateToLogin()">
+            Sign In
+          </button>
+        </p>
+      </div>
+    </div>
+  </div>
+</div>

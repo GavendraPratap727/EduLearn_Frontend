@@ -1,0 +1,134 @@
+<div class="course-detail-container" *ngIf="!loading; else loadingTemplate">
+  <div class="course-header">
+    <button class="back-btn" (click)="goBack()">
+      <i class="fas fa-arrow-left"></i>
+      Back to Courses
+    </button>
+    
+    <div class="course-hero">
+      <div class="course-thumbnail">
+        <i class="fas fa-graduation-cap"></i>
+      </div>
+      <div class="course-info">
+        <div class="course-category">{{ course?.category }}</div>
+        <h1 class="course-title">{{ course?.title }}</h1>
+        <p class="course-description">{{ course?.description }}</p>
+        
+        <div class="course-stats">
+          <span class="stat-item">
+            <i class="fas fa-users"></i> {{ course?.enrollmentCount || 0 }} students
+          </span>
+          <span class="stat-item">
+            <i class="fas fa-star"></i> {{ course?.rating || 4.5 }}
+          </span>
+          <span class="stat-item">
+            <i class="fas fa-signal"></i> {{ course?.level }}
+          </span>
+        </div>
+      </div>
+      
+      <div class="course-actions">
+        <div class="price-tag">
+          <span *ngIf="course?.price === 0" class="free">Free</span>
+          <span *ngIf="course?.price > 0" class="paid">₹{{ course?.price }}</span>
+        </div>
+        
+        <button 
+          *ngIf="!isEnrolled" 
+          class="enroll-btn primary" 
+          (click)="enrollInCourse()"
+        >
+          <i class="fas fa-plus"></i>
+          Enroll Now
+        </button>
+        
+        <button 
+          *ngIf="isEnrolled" 
+          class="start-btn primary" 
+          (click)="startLearning()"
+        >
+          <i class="fas fa-play"></i>
+          Start Learning
+        </button>
+      </div>
+    </div>
+  </div>
+  
+  <div class="course-content">
+    <div class="content-grid">
+      <div class="main-content">
+        <section class="course-section">
+          <h2>What You'll Learn</h2>
+          <div class="learning-outcomes">
+            <div class="outcome-item" *ngFor="let outcome of course?.learningOutcomes || []">
+              <i class="fas fa-check"></i>
+              <span>{{ outcome }}</span>
+            </div>
+          </div>
+        </section>
+        
+        <section class="course-section">
+          <h2>Course Content</h2>
+          <div class="course-modules">
+            <div class="module-item" *ngFor="let module of course?.modules || []">
+              <div class="module-header">
+                <i class="fas fa-book"></i>
+                <span class="module-title">{{ module.title }}</span>
+                <span class="module-duration">{{ module.duration }}</span>
+              </div>
+            </div>
+          </div>
+        </section>
+        
+        <section class="course-section">
+          <h2>Requirements</h2>
+          <div class="requirements">
+            <div class="requirement-item" *ngFor="let requirement of course?.requirements || []">
+              <i class="fas fa-chevron-right"></i>
+              <span>{{ requirement }}</span>
+            </div>
+          </div>
+        </section>
+      </div>
+      
+      <div class="sidebar">
+        <div class="info-card">
+          <h3>Course Details</h3>
+                    <div class="detail-item">
+            <span class="label">Level:</span>
+            <span class="value">{{ course?.level }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="label">Language:</span>
+            <span class="value">{{ course?.language || 'English' }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="label">Certificate:</span>
+            <span class="value">Yes</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Loading Template -->
+<ng-template #loadingTemplate>
+  <div class="loading-container">
+    <div class="loading-spinner">
+      <div class="spinner"></div>
+    </div>
+    <p class="loading-text">Loading course details...</p>
+  </div>
+</ng-template>
+
+<!-- Razorpay Payment Modal -->
+<app-razorpay-payment
+  *ngIf="showPaymentModal"
+  [courseId]="course?.courseId"
+  [courseTitle]="course?.title"
+  [amount]="course?.price"
+  [isOpen]="showPaymentModal"
+  (paymentSuccess)="onPaymentSuccess()"
+  (paymentClosed)="onPaymentClosed()">
+</app-razorpay-payment>

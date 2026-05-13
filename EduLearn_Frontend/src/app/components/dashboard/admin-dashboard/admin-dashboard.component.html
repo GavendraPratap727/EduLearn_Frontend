@@ -1,0 +1,375 @@
+<div class="admin-dashboard" *ngIf="!loading; else loadingTemplate">
+  <!-- Dashboard Header -->
+  <div class="dashboard-header">
+    <div class="welcome-content">
+      <div class="welcome-text">
+        <h1 class="welcome-title">Admin Dashboard</h1>
+        <p class="welcome-subtitle">Manage the entire EduLearn platform and monitor performance</p>
+      </div>
+      <div class="user-avatar">
+        <div class="avatar-circle">
+          <i class="fas fa-shield-alt"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Error Message -->
+  <div class="error-message" *ngIf="error">
+    <i class="fas fa-exclamation-circle"></i>
+    {{ error }}
+  </div>
+
+  <!-- Admin Actions -->
+  <div class="admin-actions-section">
+    <div class="actions-grid">
+      <button type="button" class="btn btn-primary" (click)="showCreateInstructorModal()">
+        <i class="fas fa-plus"></i>
+        Create Instructor
+      </button>
+    </div>
+  </div>
+
+  <!-- Create Instructor Modal -->
+  <div class="modal-overlay" *ngIf="showInstructorModal" (click)="hideCreateInstructorModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>Create Instructor Account</h3>
+        <button class="close-btn" (click)="hideCreateInstructorModal()">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form (ngSubmit)="createInstructor()">
+          <div class="form-group">
+            <label for="instructorName">Full Name</label>
+            <input type="text" id="instructorName" [(ngModel)]="instructorForm.fullName" name="fullName" required>
+          </div>
+          <div class="form-group">
+            <label for="instructorEmail">Email</label>
+            <input type="email" id="instructorEmail" [(ngModel)]="instructorForm.email" name="email" required>
+          </div>
+          <div class="form-group">
+            <label for="instructorPassword">Password</label>
+            <input type="password" id="instructorPassword" [(ngModel)]="instructorForm.password" name="password" required>
+          </div>
+          <div class="form-actions">
+            <button type="button" class="btn-cancel" (click)="hideCreateInstructorModal()">Cancel</button>
+            <button type="submit" class="btn-create" [disabled]="creatingInstructor">
+              <span *ngIf="!creatingInstructor">Create Instructor</span>
+              <span *ngIf="creatingInstructor">Creating...</span>
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Platform Stats -->
+  <div class="stats-section">
+    <div class="stats-grid">
+      <div class="stat-card users">
+        <div class="stat-icon">
+          <i class="fas fa-users"></i>
+        </div>
+        <div class="stat-info">
+          <h3 class="stat-number">{{ stats.totalUsers }}</h3>
+          <p class="stat-label">Total Users</p>
+        </div>
+      </div>
+      
+      <div class="stat-card courses">
+        <div class="stat-icon">
+          <i class="fas fa-graduation-cap"></i>
+        </div>
+        <div class="stat-info">
+          <h3 class="stat-number">{{ stats.totalCourses }}</h3>
+          <p class="stat-label">Total Courses</p>
+        </div>
+      </div>
+      
+      <div class="stat-card enrollments">
+        <div class="stat-icon">
+          <i class="fas fa-user-graduate"></i>
+        </div>
+        <div class="stat-info">
+          <h3 class="stat-number">{{ stats.totalEnrollments }}</h3>
+          <p class="stat-label">Total Enrollments</p>
+        </div>
+      </div>
+      
+      <div class="stat-card revenue">
+        <div class="stat-icon">
+          <i class="fas fa-dollar-sign"></i>
+        </div>
+        <div class="stat-info">
+          <h3 class="stat-number">${{ stats.totalRevenue }}</h3>
+          <p class="stat-label">Total Revenue</p>
+        </div>
+      </div>
+      
+      <div class="stat-card active">
+        <div class="stat-icon">
+          <i class="fas fa-chart-line"></i>
+        </div>
+        <div class="stat-info">
+          <h3 class="stat-number">{{ stats.activeUsers }}</h3>
+          <p class="stat-label">Active Users</p>
+        </div>
+      </div>
+      
+      <div class="stat-card pending">
+        <div class="stat-icon">
+          <i class="fas fa-clock"></i>
+        </div>
+        <div class="stat-info">
+          <h3 class="stat-number">{{ stats.pendingCourses }}</h3>
+          <p class="stat-label">Pending Approvals</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Dashboard Content -->
+  <div class="dashboard-content">
+    <div class="content-grid">
+      <!-- Pending Approvals -->
+      <div class="section-card priority">
+        <div class="section-header">
+          <div class="section-title">
+            <i class="fas fa-exclamation-triangle"></i>
+            <h2>Pending Course Approvals</h2>
+          </div>
+          <span class="badge">{{ stats.pendingCourses }}</span>
+        </div>
+        
+        <div class="approvals-container" *ngIf="pendingApprovals.length > 0; else noPending">
+          <div class="approvals-list">
+            <div class="approval-item" *ngFor="let course of pendingApprovals">
+              <div class="approval-header">
+                <div class="course-thumbnail">
+                  <i class="fas fa-graduation-cap"></i>
+                </div>
+                <div class="course-status-badge pending">Pending</div>
+              </div>
+              
+              <div class="approval-body">
+                <h3 class="course-title">{{ course.title || course.Title }}</h3>
+                <p class="instructor-name">by {{ course.instructorName || course.InstructorName || 'Unknown Instructor' }}</p>
+                <div class="course-meta">
+                  <span class="course-level">{{ course.level !== undefined ? course.level : course.Level }}</span>
+                  <span class="course-price">${{ course.price !== undefined ? course.price : course.Price }}</span>
+                  <span class="course-duration">{{ course.duration || course.Duration || 'N/A' }}</span>
+                </div>
+              </div>
+              
+              <div class="approval-actions">
+                <button class="approve-btn" (click)="approveCourse(course.courseId || course.CourseId)">
+                  <i class="fas fa-check"></i>
+                  Approve
+                </button>
+                <button class="reject-btn" (click)="rejectCourse(course.courseId || course.CourseId)">
+                  <i class="fas fa-times"></i>
+                  Reject
+                </button>
+                <button class="view-btn" (click)="viewCourseDetails(course.courseId || course.CourseId)">
+                  <i class="fas fa-eye"></i>
+                  View
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <ng-template #noPending>
+          <div class="empty-state">
+            <div class="empty-icon">
+              <i class="fas fa-check-circle"></i>
+            </div>
+            <h3>No pending approvals</h3>
+            <p>All courses have been reviewed</p>
+          </div>
+        </ng-template>
+      </div>
+
+      <!-- Recent Courses -->
+      <div class="section-card">
+        <div class="section-header">
+          <div class="section-title">
+            <i class="fas fa-graduation-cap"></i>
+            <h2>Recent Courses</h2>
+          </div>
+          <button class="view-all-btn" (click)="manageAllCourses()">
+            Manage All
+            <i class="fas fa-arrow-right"></i>
+          </button>
+        </div>
+        
+        <div class="courses-container" *ngIf="recentCourses.length > 0; else noCourses">
+          <div class="courses-list">
+            <div class="course-item" *ngFor="let course of recentCourses">
+              <div class="course-thumbnail">
+                <i class="fas fa-graduation-cap"></i>
+              </div>
+              <div class="course-details">
+                <h4>{{ course.title }}</h4>
+                <p>{{ course.instructorName }}</p>
+                <div class="course-stats">
+                  <span><i class="fas fa-users"></i> {{ course.enrollmentCount || 0 }}</span>
+                  <span><i class="fas fa-star"></i> {{ course.rating || 0 }}</span>
+                  <span><i class="fas fa-dollar-sign"></i> {{ course.price || 0 }}</span>
+                </div>
+              </div>
+              <div class="course-actions">
+                <div class="course-status" [ngClass]="course.isPublished ? 'published' : 'draft'">
+                  {{ course.isPublished ? 'Published' : 'Draft' }}
+                </div>
+                <button class="delete-btn" (click)="deleteCourse(course.courseId || course.id)" title="Delete Course">
+                  <i class="fas fa-trash"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <ng-template #noCourses>
+          <div class="empty-state">
+            <div class="empty-icon">
+              <i class="fas fa-graduation-cap"></i>
+            </div>
+            <h3>No courses yet</h3>
+            <p>Courses will appear here when instructors create them</p>
+          </div>
+        </ng-template>
+      </div>
+
+      <!-- Manage Users -->
+      <div class="section-card full-width">
+        <div class="section-header">
+          <div class="section-title">
+            <i class="fas fa-users-cog"></i>
+            <h2>Manage Users</h2>
+          </div>
+          <div class="search-container">
+            <div class="search-box">
+              <i class="fas fa-search"></i>
+              <input 
+                type="text" 
+                placeholder="Search users by name or email..." 
+                [(ngModel)]="searchQuery"
+                (input)="filterUsers()"
+                class="search-input"
+              >
+            </div>
+          </div>
+        </div>
+        
+        <!-- Instructors Section -->
+        <div class="user-section">
+          <div class="subsection-header">
+            <h3><i class="fas fa-chalkboard-teacher"></i> Instructors</h3>
+            <span class="user-count">{{ instructors.length }} instructor(s)</span>
+          </div>
+          
+          <div class="users-container" *ngIf="filteredInstructors.length > 0; else noInstructors">
+            <div class="users-grid">
+              <div class="user-card" *ngFor="let user of filteredInstructors">
+                <div class="user-avatar">
+                  <div class="avatar-circle small instructor">
+                    <i class="fas fa-chalkboard-teacher"></i>
+                  </div>
+                </div>
+                <div class="user-details">
+                  <h4>{{ user.fullName }}</h4>
+                  <p>{{ user.email }}</p>
+                  <div class="user-meta">
+                    <span class="user-role role-instructor">{{ user.role }}</span>
+                    <span class="join-date">{{ user.createdAt | date:'short' }}</span>
+                    <span class="status-badge" [ngClass]="user.isActive ? 'active' : 'inactive'">
+                      {{ user.isActive ? 'Active' : 'Inactive' }}
+                    </span>
+                  </div>
+                </div>
+                <div class="user-actions">
+                  <button class="action-btn deactivate-btn" (click)="toggleUserStatus(user)" 
+                          [title]="user.isActive ? 'Deactivate User' : 'Activate User'">
+                    <i class="fas" [ngClass]="user.isActive ? 'fa-user-slash' : 'fa-user-check'"></i>
+                  </button>
+                  <button class="action-btn delete-btn" (click)="deleteUser(user)" title="Delete User">
+                    <i class="fas fa-trash"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <ng-template #noInstructors>
+            <div class="empty-state">
+              <i class="fas fa-chalkboard-teacher"></i>
+              <h3>No instructors yet</h3>
+              <p>Create instructor accounts using the button above</p>
+            </div>
+          </ng-template>
+        </div>
+        
+        <!-- Students Section -->
+        <div class="user-section">
+          <div class="subsection-header">
+            <h3><i class="fas fa-graduation-cap"></i> Students</h3>
+            <span class="user-count">{{ students.length }} student(s)</span>
+          </div>
+          
+          <div class="users-container" *ngIf="filteredStudents.length > 0; else noStudents">
+            <div class="users-grid">
+              <div class="user-card" *ngFor="let user of filteredStudents">
+                <div class="user-avatar">
+                  <div class="avatar-circle small student">
+                    <i class="fas fa-graduation-cap"></i>
+                  </div>
+                </div>
+                <div class="user-details">
+                  <h4>{{ user.fullName }}</h4>
+                  <p>{{ user.email }}</p>
+                  <div class="user-meta">
+                    <span class="user-role role-student">{{ user.role }}</span>
+                    <span class="join-date">{{ user.createdAt | date:'short' }}</span>
+                    <span class="status-badge" [ngClass]="user.isActive ? 'active' : 'inactive'">
+                      {{ user.isActive ? 'Active' : 'Inactive' }}
+                    </span>
+                  </div>
+                </div>
+                <div class="user-actions">
+                  <button class="action-btn deactivate-btn" (click)="toggleUserStatus(user)" 
+                          [title]="user.isActive ? 'Deactivate User' : 'Activate User'">
+                    <i class="fas" [ngClass]="user.isActive ? 'fa-user-slash' : 'fa-user-check'"></i>
+                  </button>
+                  <button class="action-btn delete-btn" (click)="deleteUser(user)" title="Delete User">
+                    <i class="fas fa-trash"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <ng-template #noStudents>
+            <div class="empty-state">
+              <i class="fas fa-graduation-cap"></i>
+              <h3>No students yet</h3>
+              <p>Students will appear here when they register</p>
+            </div>
+          </ng-template>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Loading Template -->
+<ng-template #loadingTemplate>
+  <div class="loading-container">
+    <div class="loading-spinner">
+      <div class="spinner"></div>
+    </div>
+    <p class="loading-text">Loading admin dashboard...</p>
+  </div>
+</ng-template>

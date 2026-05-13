@@ -1,0 +1,104 @@
+<div class="certificate-verification-container">
+  <!-- Header Section -->
+  <div class="verification-header">
+    <div class="header-content">
+      <div class="header-text">
+        <h1 class="page-title">
+          <i class="fas fa-certificate"></i>
+          Certificate Verification
+        </h1>
+        <p class="page-subtitle">Verify the authenticity of a certificate by entering its unique ID</p>
+      </div>
+      <button class="home-btn" (click)="goHome()">
+        <i class="fas fa-home"></i>
+        Home
+      </button>
+    </div>
+  </div>
+
+  <!-- Search Section -->
+  <div class="search-section">
+    <div class="search-card">
+      <div class="search-icon">
+        <i class="fas fa-search"></i>
+      </div>
+      <div class="search-content">
+        <h2>Enter Certificate ID</h2>
+        <p>Type the certificate ID exactly as it appears on the certificate</p>
+        
+        <div class="search-form">
+          <div class="input-group">
+            <input 
+              type="text" 
+              [(ngModel)]="certificateId"
+              placeholder="e.g., CERT-ABC123-XYZ789"
+              class="cert-input"
+              (keyup.enter)="verifyCertificate()"
+              [disabled]="isSearching">
+            <button 
+              class="search-btn"
+              (click)="verifyCertificate()"
+              [disabled]="isSearching || !certificateId.trim()">
+              <i class="fas fa-search" *ngIf="!isSearching"></i>
+              <i class="fas fa-spinner fa-spin" *ngIf="isSearching"></i>
+              {{ isSearching ? 'Searching...' : 'Verify' }}
+            </button>
+          </div>
+          
+          <div class="input-hint">
+            <i class="fas fa-info-circle"></i>
+            Certificate IDs are case-sensitive and typically start with "CERT-"
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Error Message -->
+  <div class="error-section" *ngIf="errorMessage">
+    <div class="error-card">
+      <div class="error-icon">
+        <i class="fas fa-exclamation-triangle"></i>
+      </div>
+      <div class="error-content">
+        <h3>No Certificate Found</h3>
+        <p>The certificate ID you entered was not found in our system.</p>
+        <button class="retry-btn" (click)="clearSearch()">
+          <i class="fas fa-redo"></i>
+          Try Again
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Certificate Found Section -->
+  <div class="certificate-found-section" *ngIf="certificateFound">
+    <div class="success-header">
+      <div class="success-icon">
+        <i class="fas fa-check-circle"></i>
+      </div>
+      <div class="success-content">
+        <h2>Certificate Verified - It's Real</h2>
+        <p>This certificate is authentic and valid.</p>
+      </div>
+    </div>
+
+    <!-- Certificate Actions -->
+    <div class="certificate-actions">
+      <button class="action-btn new-search-btn" (click)="clearSearch()">
+        <i class="fas fa-search"></i>
+        Verify Another Certificate
+      </button>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div class="loading-section" *ngIf="isSearching">
+    <div class="loading-card">
+      <div class="loading-spinner">
+        <i class="fas fa-spinner fa-spin"></i>
+      </div>
+      <p>Verifying certificate...</p>
+    </div>
+  </div>
+</div>
