@@ -7,7 +7,7 @@ import { AuthService } from './auth.service';
   providedIn: 'root'
 })
 export class ProgressService {
-  private apiUrl = 'http://localhost:5004/api/progress';
+  private apiUrl = 'https://edulearn-progress-service-rq1l.onrender.com/api/progress';
 
   constructor(private http: HttpClient, private authService: AuthService) {}
 

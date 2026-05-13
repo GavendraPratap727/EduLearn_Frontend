@@ -7,9 +7,9 @@ import { AuthService } from './auth.service';
   providedIn: 'root'
 })
 export class CourseService {
-  private apiUrl = 'http://localhost:5001/api/courses';
+  private apiUrl = 'https://edulearn-course-service-0wsq.onrender.com/api/courses';
 
-  constructor(private http: HttpClient, private authService: AuthService) {}
+  constructor(private http: HttpClient, private authService: AuthService) { }
 
   private getHeaders(): HttpHeaders {
     return this.authService.getAuthHeaders();
