@@ -7,7 +7,7 @@ import { AuthService } from './auth.service';
   providedIn: 'root'
 })
 export class EnrollmentService {
-  private apiUrl = 'https://edulearn-enrollment-service-cxok.onrender.com/api/enrollments';
+  private apiUrl = 'https://edulearn-enrollment-service-wgro.onrender.com/api/enrollments';
 
   constructor(private http: HttpClient, private authService: AuthService) {}
 
