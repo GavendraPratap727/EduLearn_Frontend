@@ -7,7 +7,7 @@ import { map, tap, catchError } from 'rxjs/operators';
   providedIn: 'root'
 })
 export class AuthService {
-  private apiUrl = 'https://edulearn-auth-service-7c9w.onrender.com/api/auth';
+  private apiUrl = 'https://edulearn-auth-service-7zc3.onrender.com/api/auth';
   private currentUserSubject = new BehaviorSubject<any>(null);
   public currentUser$ = this.currentUserSubject.asObservable();
 
@@ -72,7 +72,7 @@ export class AuthService {
 
   logout(): Observable<any> {
     const userId = this.currentUserSubject.value?.id;
-    return this.http.post<any>(`https://edulearn-auth-service-7c9w.onrender.com/api/users/logout`, userId).pipe(
+    return this.http.post<any>(`https://edulearn-auth-service-7zc3.onrender.com/api/users/logout`, userId).pipe(
       tap(() => {
         this.currentUserSubject.next(null);
         localStorage.removeItem('currentUser');
@@ -110,25 +110,25 @@ export class AuthService {
   // Admin methods
   // Note: Backend doesn't have these specific admin endpoints, using available ones
   getRecentUsers(limit: number = 50): Observable<any> {
-    return this.http.get(`https://edulearn-auth-service-7c9w.onrender.com/api/users/recent/${limit}`, {
+    return this.http.get(`https://edulearn-auth-service-7zc3.onrender.com/api/users/recent/${limit}`, {
       headers: this.getAuthHeaders()
     });
   }
 
   toggleUserStatus(userId: string, isActive: boolean): Observable<any> {
-    return this.http.put(`https://edulearn-auth-service-7c9w.onrender.com/api/users/${userId}/status`, { isActive }, {
+    return this.http.put(`https://edulearn-auth-service-7zc3.onrender.com/api/users/${userId}/status`, { isActive }, {
       headers: this.getAuthHeaders()
     });
   }
 
   deleteUser(userId: string): Observable<any> {
-    return this.http.delete(`https://edulearn-auth-service-7c9w.onrender.com/api/users/${userId}`, {
+    return this.http.delete(`https://edulearn-auth-service-7zc3.onrender.com/api/users/${userId}`, {
       headers: this.getAuthHeaders()
     });
   }
 
   getUserById(userId: string): Observable<any> {
-    return this.http.get(`https://edulearn-auth-service-7c9w.onrender.com/api/users/${userId}`, {
+    return this.http.get(`https://edulearn-auth-service-7zc3.onrender.com/api/users/${userId}`, {
       headers: this.getAuthHeaders()
     });
   }
