@@ -7,7 +7,7 @@ import { map, tap, catchError } from 'rxjs/operators';
   providedIn: 'root'
 })
 export class AuthService {
-  private apiUrl = 'https://edulearn-auth-service-7zc3.onrender.com/api/auth';
+  private apiUrl = 'https://edulearn-auth-service-8lkx.onrender.com/api/auth';
   private currentUserSubject = new BehaviorSubject<any>(null);
   public currentUser$ = this.currentUserSubject.asObservable();
 
