@@ -7,7 +7,7 @@ import { AuthService } from './auth.service';
   providedIn: 'root'
 })
 export class PaymentService {
-  private apiUrl = 'https://edulearn-payment-service-csbn.onrender.com/api/payments';
+  private apiUrl = 'https://edulearn-payment-service-mwg8.onrender.com/api/payments';
 
   constructor(private http: HttpClient, private authService: AuthService) {}
 
