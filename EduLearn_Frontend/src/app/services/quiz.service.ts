@@ -7,7 +7,7 @@ import { AuthService } from './auth.service';
   providedIn: 'root'
 })
 export class QuizService {
-  private apiUrl = 'https://edulearn-quiz-service-0sd2.onrender.com/api/quizzes';
+  private apiUrl = 'https://edulearn-quiz-service-u7so.onrender.com/api/quizzes';
 
   constructor(
     private http: HttpClient,
