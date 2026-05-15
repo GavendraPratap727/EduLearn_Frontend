@@ -7,7 +7,7 @@ import { AuthService } from './auth.service';
   providedIn: 'root'
 })
 export class LessonService {
-  private apiUrl = 'https://edulearn-lesson-service-aik3.onrender.com/api/lessons';
+  private apiUrl = 'https://edulearn-lesson-service-o6qq.onrender.com/api/lessons';
 
   constructor(private http: HttpClient, private authService: AuthService) {}
 
